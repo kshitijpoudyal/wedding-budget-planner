@@ -6,8 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Wedding Budget Planner — a responsive web app for managing wedding finances through hierarchical budgeting, person assignments, multi-currency support, and real-time financial tracking.
 
-**Status:** Pre-implementation. Planning artifacts exist in `.specify/` and `.github/agents/`. No application source code has been written yet.
-
 ## Source of Truth Documents
 
 > **Important:** These documents are the authoritative sources. Do not duplicate their content here.
@@ -18,8 +16,6 @@ Wedding Budget Planner — a responsive web app for managing wedding finances th
 | [DESIGN-SPEC.MD](DESIGN-SPEC.MD) | Color palette, typography, shape/spacing tokens |
 
 ## Architectural Rules (Quick Reference)
-
-These rules are derived from the constitution. See `.specify/memory/constitution.md` for full details.
 
 **Data layer:**
 - All data fetching through React Query hooks — no direct Firestore calls outside query/mutation hooks
@@ -64,13 +60,3 @@ npm run dev
 npm run build
 npm run preview
 ```
-
-## Planning Framework (Speckit)
-
-Key files:
-- `.specify/memory/constitution.md` — project constitution (read this first)
-- `.specify/templates/` — templates for specs, plans, tasks, checklists
-- `.github/agents/` — Speckit agent definitions
-- `.github/prompts/` — prompt files for Speckit agents
-
-Workflow: constitution → specification → plan → tasks → checklists → implement

@@ -1,0 +1,526 @@
+{
+  "budgetItems": [
+    {
+      "id": "2Fqju9odTBC5Bh2r8EK3",
+      "name": "Drinks",
+      "budgetAmount": 20000,
+      "spentAmount": 0,
+      "parentId": "vAYXasu45lUGPWovYTEx",
+      "status": "active"
+    },
+    {
+      "id": "2WPRgB1C5na3VVc1PCNi",
+      "name": "Dula ko gadi/ghoda",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "QnmPIHxco0mDdukKENYL",
+      "status": "active"
+    },
+    {
+      "id": "3tuASSR3oWrerGShBVbj",
+      "name": "Club",
+      "budgetAmount": 30000,
+      "spentAmount": 0,
+      "parentId": "kpMHNriTUftCCAXrpZix",
+      "status": "active"
+    },
+    {
+      "id": "55WOw3kNVeOke2eeGlf4",
+      "name": "Shocks",
+      "budgetAmount": 100,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "5oZLUUeRRKXtz1LV2C3S",
+      "name": "Party Kay/Asmi/Dai/Bhaju/Didi/Bhena",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "kpMHNriTUftCCAXrpZix",
+      "status": "active"
+    },
+    {
+      "id": "6UOIxsPXN8XtLQNeR9Lj",
+      "name": "Flight Kshitij",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "k6Ti1uh4sniECBAnLUdd",
+      "status": "active"
+    },
+    {
+      "id": "7I8kwqOn0VNBseNUNoMr",
+      "name": "Red carpet",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "vAYXasu45lUGPWovYTEx",
+      "status": "active"
+    },
+    {
+      "id": "7NKuxlgbMInCajntKIGk",
+      "name": "Makeup kit",
+      "budgetAmount": 20000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "98dN80QMpOfgXBeG2KSt",
+      "name": "Flight Asmita",
+      "budgetAmount": 150000,
+      "spentAmount": 0,
+      "parentId": "k6Ti1uh4sniECBAnLUdd",
+      "status": "active"
+    },
+    {
+      "id": "9NG69tkorBajFi0Z9RGx",
+      "name": "Kham ma kharcha",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "QnmPIHxco0mDdukKENYL",
+      "status": "active"
+    },
+    {
+      "id": "AYpSUynwuEPEvbJF5fg6",
+      "name": "Didi Sharee",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "BEUe7mxyoqnd1ZzQzjxj",
+      "name": "Thulo buwa ktm/chitwan",
+      "budgetAmount": 2000,
+      "spentAmount": 0,
+      "parentId": "k6Ti1uh4sniECBAnLUdd",
+      "status": "active"
+    },
+    {
+      "id": "CHaVjZjnwi50j2ofQi3Q",
+      "name": "Reception Venue",
+      "budgetAmount": 1600000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "D72BNBtdP70ljWhQWu9J",
+      "name": "Ring",
+      "budgetAmount": 400000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "DtGY4JzwTiG3x09UjNj8",
+      "name": "Venue",
+      "budgetAmount": 1200000,
+      "spentAmount": 0,
+      "parentId": "CHaVjZjnwi50j2ofQi3Q",
+      "status": "active"
+    },
+    {
+      "id": "EaX6PuX0DX8WqrysHLSC",
+      "name": "Gifts",
+      "budgetAmount": 943000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "H1qAAKGfY5L4dA5L73Rt",
+      "name": "Kay Reception Suit",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "tYkyO8JvRmXSywjRI82R",
+      "status": "active"
+    },
+    {
+      "id": "IY4XWPsZYpmkw9prClyh",
+      "name": "Family Parents/Didi/Bhena/Dai/Bhaju",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "kpMHNriTUftCCAXrpZix",
+      "status": "active"
+    },
+    {
+      "id": "JEspcC96eE1B0BjyHbh8",
+      "name": "Panche baja",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "QnmPIHxco0mDdukKENYL",
+      "status": "active"
+    },
+    {
+      "id": "KXWEee56SHoVlctXKKAF",
+      "name": "Suit dai x2",
+      "budgetAmount": 4000,
+      "spentAmount": 0,
+      "parentId": "EaX6PuX0DX8WqrysHLSC",
+      "status": "active"
+    },
+    {
+      "id": "PbYMWI2aOwsfhuD7Sdca",
+      "name": "Gold gifts",
+      "budgetAmount": 600000,
+      "spentAmount": 0,
+      "parentId": "EaX6PuX0DX8WqrysHLSC",
+      "status": "active"
+    },
+    {
+      "id": "QA8aPZRFil2WWUB7poWc",
+      "name": "Mummy Flight",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "k6Ti1uh4sniECBAnLUdd",
+      "status": "active"
+    },
+    {
+      "id": "QgHpfstWT0slu3IQm9iw",
+      "name": "Sharee x57 (5000/pcs)",
+      "budgetAmount": 285000,
+      "spentAmount": 0,
+      "parentId": "EaX6PuX0DX8WqrysHLSC",
+      "status": "active"
+    },
+    {
+      "id": "QnmPIHxco0mDdukKENYL",
+      "name": "Wedding Day",
+      "budgetAmount": 430000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "Rp0Ledg1T0NiExRn6gi9",
+      "name": "Didi reception dress",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "RtXUbtvYjWQ6FQDi7IEq",
+      "name": "Bhena Reception Suit",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "TIYaO0O3Gee8oIh2jcYN",
+      "name": "Suit Mama and thulobuwa",
+      "budgetAmount": 36000,
+      "spentAmount": 0,
+      "parentId": "EaX6PuX0DX8WqrysHLSC",
+      "status": "active"
+    },
+    {
+      "id": "XaUO64P6aGUeihJmMNzd",
+      "name": "Chasma",
+      "budgetAmount": 2000,
+      "spentAmount": 0,
+      "parentId": "tYkyO8JvRmXSywjRI82R",
+      "status": "active"
+    },
+    {
+      "id": "YMDuysZRfe741AglrcZQ",
+      "name": "Mummy Sharee",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "YQREAStEojuydq96xjJ9",
+      "name": "Inners",
+      "budgetAmount": 4000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "Z9elSAbIz9wfnVXoR0pK",
+      "name": "Reception Lehenga",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "ZFe2HA2BrXVqffA5WZLQ",
+      "name": "Extra housing",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "vAYXasu45lUGPWovYTEx",
+      "status": "active"
+    },
+    {
+      "id": "bgPwUCei6EbeVARRORZV",
+      "name": "Suit Bhanij dai x4",
+      "budgetAmount": 8000,
+      "spentAmount": 0,
+      "parentId": "EaX6PuX0DX8WqrysHLSC",
+      "status": "active"
+    },
+    {
+      "id": "c2sZLv1Zad7eaKMJbmaG",
+      "name": "Daddy Suit",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "fqFnqgL0PQCxqLIPCkZ3",
+      "name": "Immediate Family Gift",
+      "budgetAmount": 355000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "gTNP1fTIQgHMvAdcbyzF",
+      "name": "Bhena daura surwal",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "hqwKNLwEHKLvistFjpj5",
+      "name": "Janti ko housing KTM",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "iDlIGHwHgUJ5vLW16NWA",
+      "name": "Mummy Sharee 2",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "ivFVm1e72vQBViUjqbVo",
+      "name": "Daddy Flight",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "k6Ti1uh4sniECBAnLUdd",
+      "status": "active"
+    },
+    {
+      "id": "k07SMB6cGHDBZcjqNWXB",
+      "name": "Kiru and other bahini",
+      "budgetAmount": 10000,
+      "spentAmount": 0,
+      "parentId": "EaX6PuX0DX8WqrysHLSC",
+      "status": "active"
+    },
+    {
+      "id": "k6Ti1uh4sniECBAnLUdd",
+      "name": "Travel",
+      "budgetAmount": 458000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "kpMHNriTUftCCAXrpZix",
+      "name": "Ramailo",
+      "budgetAmount": 230000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "krot4UoWzF6WScahTQOs",
+      "name": "Food",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "CHaVjZjnwi50j2ofQi3Q",
+      "status": "active"
+    },
+    {
+      "id": "lKNhUleHMTN9MHahPZ6m",
+      "name": "Bhanji kharcha (Dress n all)",
+      "budgetAmount": 50000,
+      "spentAmount": 0,
+      "parentId": "fqFnqgL0PQCxqLIPCkZ3",
+      "status": "active"
+    },
+    {
+      "id": "o81uTYqmRxjtzbC0Yj56",
+      "name": "Asmi Kharcha",
+      "budgetAmount": 681200,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "osuHUQ3EIP0urDCIvG8G",
+      "name": "Thulo aama ktm/chitwan",
+      "budgetAmount": 6000,
+      "spentAmount": 0,
+      "parentId": "k6Ti1uh4sniECBAnLUdd",
+      "status": "active"
+    },
+    {
+      "id": "p8rwUNCidmqdSxtElERf",
+      "name": "Food 3days",
+      "budgetAmount": 40000,
+      "spentAmount": 0,
+      "parentId": "vAYXasu45lUGPWovYTEx",
+      "status": "active"
+    },
+    {
+      "id": "qA5RSqbjwgpywPYHLyIm",
+      "name": "Ktm ghar decoration",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "vAYXasu45lUGPWovYTEx",
+      "status": "active"
+    },
+    {
+      "id": "qHXqXvdk3G3te1G9OFqJ",
+      "name": "Kurtha",
+      "budgetAmount": 2000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "sOx7IXoL6OSGjjnMwMje",
+      "name": "ToothBrush",
+      "budgetAmount": 100,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "tKdAXSaU63ACndI6HWMH",
+      "name": "Suitcase",
+      "budgetAmount": 40000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "tYkyO8JvRmXSywjRI82R",
+      "name": "Dula kharcha",
+      "budgetAmount": 202000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "u79KO1u9sPDVjujrbCBg",
+      "name": "Jutta lukaune",
+      "budgetAmount": 30000,
+      "spentAmount": 0,
+      "parentId": "QnmPIHxco0mDdukKENYL",
+      "status": "active"
+    },
+    {
+      "id": "uXmYjkiw0ABxfKnbE3Ey",
+      "name": "Decoration",
+      "budgetAmount": 400000,
+      "spentAmount": 0,
+      "parentId": "CHaVjZjnwi50j2ofQi3Q",
+      "status": "active"
+    },
+    {
+      "id": "vAYXasu45lUGPWovYTEx",
+      "name": "Ktm Ghar Kharcha",
+      "budgetAmount": 560000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "wbm1Od3Oe5yXxQPWVriu",
+      "name": "Shoes",
+      "budgetAmount": 8000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "xFTt2wWYXXdwXoEsxkpj",
+      "name": "Nepal ma extra kharcha",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": null,
+      "status": "active"
+    },
+    {
+      "id": "y1eeIltB1ngtIVwSsIoD",
+      "name": "Night Dress",
+      "budgetAmount": 5000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "yaBcOI1MC9qPb4kYuEx7",
+      "name": "Watch",
+      "budgetAmount": 2000,
+      "spentAmount": 0,
+      "parentId": "o81uTYqmRxjtzbC0Yj56",
+      "status": "active"
+    },
+    {
+      "id": "yjGwo5ufYrYBcPpGvi8a",
+      "name": "Janti Buses",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "QnmPIHxco0mDdukKENYL",
+      "status": "active"
+    },
+    {
+      "id": "z2q4SpI2WKDUS7KIcoMN",
+      "name": "Kay wedding dress",
+      "budgetAmount": 100000,
+      "spentAmount": 0,
+      "parentId": "tYkyO8JvRmXSywjRI82R",
+      "status": "active"
+    },
+    {
+      "id": "zAnxZFcWlIsMEBYLsaNt",
+      "name": "Drinks",
+      "budgetAmount": 200000,
+      "spentAmount": 0,
+      "parentId": "CHaVjZjnwi50j2ofQi3Q",
+      "status": "active"
+    }
+  ],
+  "people": [
+    {
+      "id": "78JghQh3DP6CJYJBYzBA",
+      "name": "Asmita"
+    },
+    {
+      "id": "7GAeM0aiI7PEfsS8eAJ6",
+      "name": "Balaram"
+    },
+    {
+      "id": "7f65d8gSrquCNoDegb8z",
+      "name": "Laxmi"
+    },
+    {
+      "id": "GwINgesyElmNpuXLKSEw",
+      "name": "Kshitij"
+    },
+    {
+      "id": "fjtgZ4Xj2TckYfIpCbHC",
+      "name": "Kushal"
+    },
+    {
+      "id": "q27eKNRyWXdnBYeUzpyL",
+      "name": "Lochana"
+    }
+  ]
+}

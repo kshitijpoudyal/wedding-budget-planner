@@ -8,9 +8,10 @@ import {
   serverTimestamp,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { userCollection } from "@/lib/userPath"
 import type { Person, PersonInput } from "@/types"
 
-const COLLECTION = "people"
+const COLLECTION = userCollection("people")
 
 export async function getAllPeople(): Promise<Person[]> {
   const snapshot = await getDocs(collection(db, COLLECTION))

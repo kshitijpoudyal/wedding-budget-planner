@@ -8,9 +8,10 @@ import {
   serverTimestamp,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { userCollection } from "@/lib/userPath"
 import type { BudgetItem, BudgetItemInput } from "@/types"
 
-const COLLECTION = "budgetItems"
+const COLLECTION = userCollection("budgetItems")
 
 export async function getAllBudgetItems(): Promise<BudgetItem[]> {
   const snapshot = await getDocs(collection(db, COLLECTION))

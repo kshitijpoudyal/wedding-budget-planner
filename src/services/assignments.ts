@@ -8,9 +8,10 @@ import {
   where,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { userCollection } from "@/lib/userPath"
 import type { Assignment } from "@/types"
 
-const COLLECTION = "assignments"
+const COLLECTION = userCollection("assignments")
 
 export async function getAllAssignments(): Promise<Assignment[]> {
   const snapshot = await getDocs(collection(db, COLLECTION))

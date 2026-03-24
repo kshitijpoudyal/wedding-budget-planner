@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { collection, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { userCollection } from "@/lib/userPath"
 import { getAllBudgetItems } from "@/services/budgetItems"
 import type { BudgetItem } from "@/types"
 
@@ -11,7 +12,7 @@ export function useBudgetItems() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "budgetItems"), (snapshot) => {
+    const unsubscribe = onSnapshot(collection(db, userCollection("budgetItems")), (snapshot) => {
       const items = snapshot.docs.map(
         (d) => ({ id: d.id, ...d.data() }) as BudgetItem,
       )

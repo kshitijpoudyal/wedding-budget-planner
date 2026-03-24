@@ -1,4 +1,5 @@
 import { getAllBudgetItems, deleteBudgetItem } from "./budgetItems"
+import { deletePerson } from "./people"
 import { deleteAssignmentsByBudgetItem, deleteAssignmentsByPerson } from "./assignments"
 
 /**
@@ -36,6 +37,5 @@ export async function cascadeDeleteBudgetItem(itemId: string): Promise<void> {
  */
 export async function cascadeDeletePerson(personId: string): Promise<void> {
   await deleteAssignmentsByPerson(personId)
-  const { deletePerson } = await import("./people")
   await deletePerson(personId)
 }

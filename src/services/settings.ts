@@ -1,8 +1,9 @@
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { USER_PREFIX } from "@/lib/userPath"
 import type { Settings } from "@/types"
 
-const DOC_PATH = "settings/global"
+const DOC_PATH = `${USER_PREFIX}/settings/global`
 
 const DEFAULT_SETTINGS: Settings = {
   currency: "NPR",
