@@ -19,7 +19,9 @@
       "mcp__stitch__get_screen",
       "WebFetch(domain:contribution.usercontent.google.com)",
       "Bash(node:*)",
-      "Bash(vercel env:*)"
+      "Bash(vercel env:*)",
+      "Bash(find /Users/a266352/Desktop/YalaIt/wedding-budget-planner -maxdepth 1 -name .env* -o -name *.env*)",
+      "Bash(grep -r \"export.*auth\\\\|export.*Auth\\\\|export.*user\\\\|export.*User\" /Users/a266352/Desktop/YalaIt/wedding-budget-planner/src --include=*.ts --include=*.tsx)"
     ]
   }
 }

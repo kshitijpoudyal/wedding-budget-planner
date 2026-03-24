@@ -3,8 +3,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { queryClient } from "@/lib/queryClient"
+import { AuthProvider } from "@/contexts/AuthContext"
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { AppLayout } from "@/components/layout/AppLayout"
 import BudgetPage from "@/pages/BudgetPage"
+import LoginPage from "@/pages/LoginPage"
 
 const PeoplePage = lazy(() => import("@/pages/PeoplePage"))
 const SummaryPage = lazy(() => import("@/pages/SummaryPage"))
@@ -20,21 +23,26 @@ function PageFallback() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<Navigate to="/budget" replace />} />
-              <Route path="/budget" element={<BudgetPage />} />
-              <Route path="/people" element={<Suspense fallback={<PageFallback />}><PeoplePage /></Suspense>} />
-              <Route path="/summary" element={<Suspense fallback={<PageFallback />}><SummaryPage /></Suspense>} />
-              <Route path="/settings" element={<Suspense fallback={<PageFallback />}><SettingsPage /></Suspense>} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<AppLayout />}>
+                  <Route path="/" element={<Navigate to="/budget" replace />} />
+                  <Route path="/budget" element={<BudgetPage />} />
+                  <Route path="/people" element={<Suspense fallback={<PageFallback />}><PeoplePage /></Suspense>} />
+                  <Route path="/summary" element={<Suspense fallback={<PageFallback />}><SummaryPage /></Suspense>} />
+                  <Route path="/settings" element={<Suspense fallback={<PageFallback />}><SettingsPage /></Suspense>} />
+                </Route>
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   )
 }
 

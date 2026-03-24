@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { signOut } from "firebase/auth"
 import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,12 +16,17 @@ import { SectionHeading } from "@/components/ui/section-heading"
 import { useSettings } from "@/hooks/useSettings"
 import { useUpdateSettings } from "@/hooks/useSettingsMutations"
 import { useTheme } from "@/hooks/useTheme"
+import { useAuth } from "@/contexts/AuthContext"
+import { auth } from "@/lib/firebase"
+import { queryClient } from "@/lib/queryClient"
 import type { Settings } from "@/types"
 
 export default function SettingsPage() {
   const { data: settings, isLoading } = useSettings()
   const updateSettings = useUpdateSettings()
   const { theme, toggleTheme } = useTheme()
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [currency, setCurrency] = useState<Settings["currency"]>("NPR")
   const [exchangeRate, setExchangeRate] = useState("")
@@ -111,6 +118,28 @@ export default function SettingsPage() {
           </div>
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="lg" />
+          </Button>
+        </div>
+      </section>
+
+      {/* Account */}
+      <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
+        <h3 className="font-heading text-base font-bold">Account</h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">{user?.email}</p>
+            <p className="text-xs text-muted-foreground">Signed in</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await signOut(auth)
+              queryClient.clear()
+              navigate("/login", { replace: true })
+            }}
+          >
+            <Icon name="logout" size="md" className="mr-2" />
+            Sign Out
           </Button>
         </div>
       </section>

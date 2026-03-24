@@ -2,26 +2,33 @@ import { useEffect } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { doc, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { USER_PREFIX } from "@/lib/userPath"
+import { useUserId } from "@/contexts/AuthContext"
 import { getSettings } from "@/services/settings"
 import type { Settings } from "@/types"
 
-const QUERY_KEY = ["settings"]
-
 export function useSettings() {
   const queryClient = useQueryClient()
+  const userId = useUserId()
+  const queryKey = ["settings", userId]
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, `${USER_PREFIX}/settings/global`), (snap) => {
-      if (snap.exists()) {
-        queryClient.setQueryData(QUERY_KEY, snap.data() as Settings)
-      }
-    })
+    const unsubscribe = onSnapshot(
+      doc(db, `users/${userId}/settings/global`),
+      (snap) => {
+        if (snap.exists()) {
+          queryClient.setQueryData(queryKey, snap.data() as Settings)
+        }
+      },
+      (error) => {
+        console.error("settings snapshot error:", error)
+        queryClient.invalidateQueries({ queryKey })
+      },
+    )
     return unsubscribe
-  }, [queryClient])
+  }, [queryClient, userId])
 
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: getSettings,
+    queryKey,
+    queryFn: () => getSettings(userId),
   })
 }

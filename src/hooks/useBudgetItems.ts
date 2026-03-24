@@ -3,33 +3,34 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { collection, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { userCollection } from "@/lib/userPath"
+import { useUserId } from "@/contexts/AuthContext"
 import { getAllBudgetItems } from "@/services/budgetItems"
 import type { BudgetItem } from "@/types"
 
-const QUERY_KEY = ["budgetItems"]
-
 export function useBudgetItems() {
   const queryClient = useQueryClient()
+  const userId = useUserId()
+  const queryKey = ["budgetItems", userId]
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, userCollection("budgetItems")),
+      collection(db, userCollection(userId, "budgetItems")),
       (snapshot) => {
         const items = snapshot.docs.map(
           (d) => ({ id: d.id, ...d.data() }) as BudgetItem,
         )
-        queryClient.setQueryData(QUERY_KEY, items)
+        queryClient.setQueryData(queryKey, items)
       },
       (error) => {
         console.error("budgetItems snapshot error:", error)
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+        queryClient.invalidateQueries({ queryKey })
       },
     )
     return unsubscribe
-  }, [queryClient])
+  }, [queryClient, userId])
 
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: getAllBudgetItems,
+    queryKey,
+    queryFn: () => getAllBudgetItems(userId),
   })
 }

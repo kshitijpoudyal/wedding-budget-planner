@@ -11,15 +11,13 @@ import { db } from "@/lib/firebase"
 import { userCollection } from "@/lib/userPath"
 import type { Person, PersonInput } from "@/types"
 
-const COLLECTION = userCollection("people")
-
-export async function getAllPeople(): Promise<Person[]> {
-  const snapshot = await getDocs(collection(db, COLLECTION))
+export async function getAllPeople(userId: string): Promise<Person[]> {
+  const snapshot = await getDocs(collection(db, userCollection(userId, "people")))
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Person)
 }
 
-export async function createPerson(input: PersonInput): Promise<string> {
-  const docRef = await addDoc(collection(db, COLLECTION), {
+export async function createPerson(userId: string, input: PersonInput): Promise<string> {
+  const docRef = await addDoc(collection(db, userCollection(userId, "people")), {
     ...input,
     createdAt: serverTimestamp(),
   })
@@ -27,12 +25,13 @@ export async function createPerson(input: PersonInput): Promise<string> {
 }
 
 export async function updatePerson(
+  userId: string,
   id: string,
   data: Partial<PersonInput>,
 ): Promise<void> {
-  await updateDoc(doc(db, COLLECTION, id), data)
+  await updateDoc(doc(db, userCollection(userId, "people"), id), data)
 }
 
-export async function deletePerson(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTION, id))
+export async function deletePerson(userId: string, id: string): Promise<void> {
+  await deleteDoc(doc(db, userCollection(userId, "people"), id))
 }

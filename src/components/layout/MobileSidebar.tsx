@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { signOut } from "firebase/auth"
 import { Icon, type IconName } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import {
@@ -8,6 +9,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { auth } from "@/lib/firebase"
+import { queryClient } from "@/lib/queryClient"
 
 const navItems: { to: string; label: string; icon: IconName }[] = [
   { to: "/budget", label: "Budget", icon: "payments" },
@@ -24,6 +27,14 @@ type MobileSidebarProps = {
 }
 
 export function MobileSidebar({ open, onOpenChange, theme, onToggleTheme }: MobileSidebarProps) {
+  const navigate = useNavigate()
+
+  const handleSignOut = async () => {
+    await signOut(auth)
+    queryClient.clear()
+    navigate("/login", { replace: true })
+  }
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[260px] p-0">
@@ -51,10 +62,14 @@ export function MobileSidebar({ open, onOpenChange, theme, onToggleTheme }: Mobi
             </NavLink>
           ))}
         </nav>
-        <div className="mt-auto px-2 py-3">
+        <div className="mt-auto px-2 py-3 space-y-1">
           <Button variant="ghost" onClick={onToggleTheme} className="w-full justify-start gap-3">
             <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="md" />
             <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+          </Button>
+          <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start gap-3">
+            <Icon name="logout" size="md" />
+            <span>Sign Out</span>
           </Button>
         </div>
       </SheetContent>

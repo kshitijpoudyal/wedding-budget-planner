@@ -3,33 +3,34 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { collection, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { userCollection } from "@/lib/userPath"
+import { useUserId } from "@/contexts/AuthContext"
 import { getAllAssignments } from "@/services/assignments"
 import type { Assignment } from "@/types"
 
-const QUERY_KEY = ["assignments"]
-
 export function useAssignments() {
   const queryClient = useQueryClient()
+  const userId = useUserId()
+  const queryKey = ["assignments", userId]
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, userCollection("assignments")),
+      collection(db, userCollection(userId, "assignments")),
       (snapshot) => {
         const items = snapshot.docs.map(
           (d) => ({ id: d.id, ...d.data() }) as Assignment,
         )
-        queryClient.setQueryData(QUERY_KEY, items)
+        queryClient.setQueryData(queryKey, items)
       },
       (error) => {
         console.error("assignments snapshot error:", error)
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+        queryClient.invalidateQueries({ queryKey })
       },
     )
     return unsubscribe
-  }, [queryClient])
+  }, [queryClient, userId])
 
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: getAllAssignments,
+    queryKey,
+    queryFn: () => getAllAssignments(userId),
   })
 }

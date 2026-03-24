@@ -11,15 +11,13 @@ import { db } from "@/lib/firebase"
 import { userCollection } from "@/lib/userPath"
 import type { BudgetItem, BudgetItemInput } from "@/types"
 
-const COLLECTION = userCollection("budgetItems")
-
-export async function getAllBudgetItems(): Promise<BudgetItem[]> {
-  const snapshot = await getDocs(collection(db, COLLECTION))
+export async function getAllBudgetItems(userId: string): Promise<BudgetItem[]> {
+  const snapshot = await getDocs(collection(db, userCollection(userId, "budgetItems")))
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as BudgetItem)
 }
 
-export async function createBudgetItem(input: BudgetItemInput): Promise<string> {
-  const docRef = await addDoc(collection(db, COLLECTION), {
+export async function createBudgetItem(userId: string, input: BudgetItemInput): Promise<string> {
+  const docRef = await addDoc(collection(db, userCollection(userId, "budgetItems")), {
     ...input,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -28,15 +26,16 @@ export async function createBudgetItem(input: BudgetItemInput): Promise<string> 
 }
 
 export async function updateBudgetItem(
+  userId: string,
   id: string,
   data: Partial<BudgetItemInput>,
 ): Promise<void> {
-  await updateDoc(doc(db, COLLECTION, id), {
+  await updateDoc(doc(db, userCollection(userId, "budgetItems"), id), {
     ...data,
     updatedAt: serverTimestamp(),
   })
 }
 
-export async function deleteBudgetItem(id: string): Promise<void> {
-  await deleteDoc(doc(db, COLLECTION, id))
+export async function deleteBudgetItem(userId: string, id: string): Promise<void> {
+  await deleteDoc(doc(db, userCollection(userId, "budgetItems"), id))
 }

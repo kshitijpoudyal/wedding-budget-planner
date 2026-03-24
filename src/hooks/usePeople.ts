@@ -3,33 +3,34 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { collection, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { userCollection } from "@/lib/userPath"
+import { useUserId } from "@/contexts/AuthContext"
 import { getAllPeople } from "@/services/people"
 import type { Person } from "@/types"
 
-const QUERY_KEY = ["people"]
-
 export function usePeople() {
   const queryClient = useQueryClient()
+  const userId = useUserId()
+  const queryKey = ["people", userId]
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, userCollection("people")),
+      collection(db, userCollection(userId, "people")),
       (snapshot) => {
         const items = snapshot.docs.map(
           (d) => ({ id: d.id, ...d.data() }) as Person,
         )
-        queryClient.setQueryData(QUERY_KEY, items)
+        queryClient.setQueryData(queryKey, items)
       },
       (error) => {
         console.error("people snapshot error:", error)
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+        queryClient.invalidateQueries({ queryKey })
       },
     )
     return unsubscribe
-  }, [queryClient])
+  }, [queryClient, userId])
 
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: getAllPeople,
+    queryKey,
+    queryFn: () => getAllPeople(userId),
   })
 }

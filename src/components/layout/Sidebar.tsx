@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { signOut } from "firebase/auth"
 import { Icon, type IconName } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import {
@@ -7,6 +8,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { auth } from "@/lib/firebase"
+import { queryClient } from "@/lib/queryClient"
 
 const navItems: { to: string; label: string; icon: IconName }[] = [
   { to: "/budget", label: "Budget", icon: "payments" },
@@ -23,6 +26,14 @@ type SidebarProps = {
 }
 
 export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarProps) {
+  const navigate = useNavigate()
+
+  const handleSignOut = async () => {
+    await signOut(auth)
+    queryClient.clear()
+    navigate("/login", { replace: true })
+  }
+
   return (
     <aside
       className={cn(
@@ -80,23 +91,39 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
         })}
       </nav>
 
-      <div className="px-2 py-3">
+      <div className="px-2 py-3 space-y-1">
         {collapsed ? (
-          <Tooltip>
-            <TooltipTrigger render={<span />}>
-              <Button variant="ghost" size="icon" onClick={onToggleTheme} className="w-full">
-                <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="md" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {theme === "dark" ? "Light mode" : "Dark mode"}
-            </TooltipContent>
-          </Tooltip>
+          <>
+            <Tooltip>
+              <TooltipTrigger render={<span />}>
+                <Button variant="ghost" size="icon" onClick={onToggleTheme} className="w-full">
+                  <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="md" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                {theme === "dark" ? "Light mode" : "Dark mode"}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger render={<span />}>
+                <Button variant="ghost" size="icon" onClick={handleSignOut} className="w-full">
+                  <Icon name="logout" size="md" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Sign Out</TooltipContent>
+            </Tooltip>
+          </>
         ) : (
-          <Button variant="ghost" onClick={onToggleTheme} className="w-full justify-start gap-3">
-            <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="md" />
-            <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
-          </Button>
+          <>
+            <Button variant="ghost" onClick={onToggleTheme} className="w-full justify-start gap-3">
+              <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="md" />
+              <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+            </Button>
+            <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start gap-3">
+              <Icon name="logout" size="md" />
+              <span>Sign Out</span>
+            </Button>
+          </>
         )}
       </div>
     </aside>

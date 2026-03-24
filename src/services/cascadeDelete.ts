@@ -5,10 +5,9 @@ import { deleteAssignmentsByBudgetItem, deleteAssignmentsByPerson } from "./assi
 /**
  * Delete a budget item and all its descendants + related assignments.
  */
-export async function cascadeDeleteBudgetItem(itemId: string): Promise<void> {
-  const allItems = await getAllBudgetItems()
+export async function cascadeDeleteBudgetItem(userId: string, itemId: string): Promise<void> {
+  const allItems = await getAllBudgetItems(userId)
 
-  // Collect all descendant IDs recursively
   const idsToDelete = new Set<string>()
 
   function collectDescendants(parentId: string) {
@@ -23,11 +22,10 @@ export async function cascadeDeleteBudgetItem(itemId: string): Promise<void> {
   idsToDelete.add(itemId)
   collectDescendants(itemId)
 
-  // Delete all assignments for each item, then delete the items
   await Promise.all(
     Array.from(idsToDelete).map(async (id) => {
-      await deleteAssignmentsByBudgetItem(id)
-      await deleteBudgetItem(id)
+      await deleteAssignmentsByBudgetItem(userId, id)
+      await deleteBudgetItem(userId, id)
     }),
   )
 }
@@ -35,7 +33,7 @@ export async function cascadeDeleteBudgetItem(itemId: string): Promise<void> {
 /**
  * Delete a person and all their assignments.
  */
-export async function cascadeDeletePerson(personId: string): Promise<void> {
-  await deleteAssignmentsByPerson(personId)
-  await deletePerson(personId)
+export async function cascadeDeletePerson(userId: string, personId: string): Promise<void> {
+  await deleteAssignmentsByPerson(userId, personId)
+  await deletePerson(userId, personId)
 }
