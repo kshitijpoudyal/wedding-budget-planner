@@ -3,7 +3,14 @@
     "allow": [
       "Bash(git init:*)",
       "Bash(git config:*)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "Bash(npm create:*)",
+      "Bash(cp /tmp/wedding-budget-planner-temp/package.json /tmp/wedding-budget-planner-temp/tsconfig.json /tmp/wedding-budget-planner-temp/tsconfig.app.json /tmp/wedding-budget-planner-temp/tsconfig.node.json /tmp/wedding-budget-planner-temp/vite.config.ts /tmp/wedding-budget-planner-temp/index.html /tmp/wedding-budget-planner-temp/eslint.config.js .)",
+      "Bash(cp -r /tmp/wedding-budget-planner-temp/src .)",
+      "Bash(cp -r /tmp/wedding-budget-planner-temp/public .)",
+      "Bash(rm -rf /tmp/wedding-budget-planner-temp)",
+      "Bash(npm install:*)",
+      "Bash(npx:*)"
     ]
   }
 }
