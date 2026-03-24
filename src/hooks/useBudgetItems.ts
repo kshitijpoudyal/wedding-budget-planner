@@ -12,12 +12,19 @@ export function useBudgetItems() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, userCollection("budgetItems")), (snapshot) => {
-      const items = snapshot.docs.map(
-        (d) => ({ id: d.id, ...d.data() }) as BudgetItem,
-      )
-      queryClient.setQueryData(QUERY_KEY, items)
-    })
+    const unsubscribe = onSnapshot(
+      collection(db, userCollection("budgetItems")),
+      (snapshot) => {
+        const items = snapshot.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as BudgetItem,
+        )
+        queryClient.setQueryData(QUERY_KEY, items)
+      },
+      (error) => {
+        console.error("budgetItems snapshot error:", error)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+      },
+    )
     return unsubscribe
   }, [queryClient])
 

@@ -15,7 +15,7 @@ import {
 import type { BudgetItemInput } from "@/types"
 
 export default function BudgetPage() {
-  const { tree, grandTotalBudget, grandTotalSpent, progress, isLoading } =
+  const { tree, grandTotalBudget, grandTotalSpent, progress, isLoading, isError, error } =
     useBudgetTree()
 
   const createMutation = useCreateBudgetItem()
@@ -57,6 +57,17 @@ export default function BudgetPage() {
     } else {
       createMutation.mutate(data, { onSuccess: () => setFormOpen(false) })
     }
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-2">
+        <p className="text-destructive font-medium">Failed to load budget data</p>
+        <p className="text-muted-foreground text-sm">
+          {error?.message || "Please check your connection and try again."}
+        </p>
+      </div>
+    )
   }
 
   if (isLoading) {

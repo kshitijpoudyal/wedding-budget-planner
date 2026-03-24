@@ -12,12 +12,19 @@ export function usePeople() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, userCollection("people")), (snapshot) => {
-      const items = snapshot.docs.map(
-        (d) => ({ id: d.id, ...d.data() }) as Person,
-      )
-      queryClient.setQueryData(QUERY_KEY, items)
-    })
+    const unsubscribe = onSnapshot(
+      collection(db, userCollection("people")),
+      (snapshot) => {
+        const items = snapshot.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as Person,
+        )
+        queryClient.setQueryData(QUERY_KEY, items)
+      },
+      (error) => {
+        console.error("people snapshot error:", error)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+      },
+    )
     return unsubscribe
   }, [queryClient])
 

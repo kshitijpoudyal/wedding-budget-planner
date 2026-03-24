@@ -18,7 +18,8 @@
       "mcp__stitch__list_screens",
       "mcp__stitch__get_screen",
       "WebFetch(domain:contribution.usercontent.google.com)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(vercel env:*)"
     ]
   }
 }

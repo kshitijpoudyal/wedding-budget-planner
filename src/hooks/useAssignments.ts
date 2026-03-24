@@ -12,12 +12,19 @@ export function useAssignments() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, userCollection("assignments")), (snapshot) => {
-      const items = snapshot.docs.map(
-        (d) => ({ id: d.id, ...d.data() }) as Assignment,
-      )
-      queryClient.setQueryData(QUERY_KEY, items)
-    })
+    const unsubscribe = onSnapshot(
+      collection(db, userCollection("assignments")),
+      (snapshot) => {
+        const items = snapshot.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as Assignment,
+        )
+        queryClient.setQueryData(QUERY_KEY, items)
+      },
+      (error) => {
+        console.error("assignments snapshot error:", error)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+      },
+    )
     return unsubscribe
   }, [queryClient])
 
