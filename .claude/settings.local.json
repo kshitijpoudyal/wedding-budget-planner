@@ -10,7 +10,9 @@
       "Bash(cp -r /tmp/wedding-budget-planner-temp/public .)",
       "Bash(rm -rf /tmp/wedding-budget-planner-temp)",
       "Bash(npm install:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
