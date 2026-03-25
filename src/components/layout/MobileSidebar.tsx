@@ -39,7 +39,7 @@ export function MobileSidebar({ open, onOpenChange, theme, onToggleTheme }: Mobi
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[260px] p-0">
         <SheetHeader className="h-14 px-4 flex items-center">
-          <SheetTitle className="font-heading text-lg font-bold tracking-tight">
+          <SheetTitle className="text-lg font-bold tracking-tight">
             Wedding Planner
           </SheetTitle>
         </SheetHeader>

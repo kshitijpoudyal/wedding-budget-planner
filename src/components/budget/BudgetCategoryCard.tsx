@@ -47,7 +47,7 @@ export function BudgetCategoryCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-heading text-lg font-bold truncate">{item.name}</h3>
+              <h3 className="text-lg font-bold truncate">{item.name}</h3>
               <StatusBadge status={item.status} />
             </div>
             <div className="flex gap-4 mt-1.5 text-sm text-muted-foreground tabular-nums">

@@ -31,7 +31,7 @@ export function StatCard({ label, value, icon, className, variant = "default" }:
       </div>
       <p
         className={cn(
-          "mt-1 font-heading text-2xl font-bold tracking-tight",
+          "mt-1 text-2xl font-bold tracking-tight",
           variant === "danger" ? "text-destructive" : "text-card-foreground",
         )}
       >

@@ -42,7 +42,7 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
     >
       <div className={cn("flex items-center h-14 px-4", collapsed ? "justify-center" : "gap-2")}>
         {!collapsed && (
-          <span className="font-heading text-lg font-bold tracking-tight truncate">
+          <span className="text-lg font-bold tracking-tight truncate">
             Wedding Planner
           </span>
         )}

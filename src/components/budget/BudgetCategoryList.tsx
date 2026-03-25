@@ -42,7 +42,7 @@ export function BudgetCategoryList({
 
       {sortedTree.length === 0 ? (
         <div className="rounded-xl bg-surface-container-low p-8 md:p-12 text-center">
-          <p className="font-heading text-lg text-muted-foreground italic">
+          <p className="text-lg text-muted-foreground italic">
             Your celebration awaits its first chapter.
           </p>
           <Button onClick={onAddRoot} className="mt-4">

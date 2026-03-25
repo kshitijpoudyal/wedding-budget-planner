@@ -25,7 +25,7 @@ export function CategoryBreakdown({ tree, currency, exchangeRate }: CategoryBrea
             className="rounded-xl bg-card p-4 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low"
           >
             <div className="flex items-center justify-between mb-1">
-              <h4 className="font-heading text-sm font-bold truncate">{node.item.name}</h4>
+              <h4 className="text-sm font-bold truncate">{node.item.name}</h4>
               <span className="text-xs text-muted-foreground tabular-nums">
                 {Math.round(percent)}%
               </span>

@@ -67,7 +67,7 @@ export default function SettingsPage() {
 
       {/* Currency */}
       <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
-        <h3 className="font-heading text-base font-bold">Currency</h3>
+        <h3 className="text-base font-bold">Currency</h3>
 
         <div className="space-y-2">
           <Label htmlFor="currency">Display Currency</Label>
@@ -108,7 +108,7 @@ export default function SettingsPage() {
 
       {/* Appearance */}
       <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
-        <h3 className="font-heading text-base font-bold">Appearance</h3>
+        <h3 className="text-base font-bold">Appearance</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">Dark Mode</p>
@@ -124,7 +124,7 @@ export default function SettingsPage() {
 
       {/* Account */}
       <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
-        <h3 className="font-heading text-base font-bold">Account</h3>
+        <h3 className="text-base font-bold">Account</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{user?.email}</p>

@@ -60,7 +60,7 @@ export default function SummaryPage() {
       <div className="rounded-xl bg-card p-4 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-medium">Overall Progress</p>
-          <p className="text-sm font-heading font-bold tabular-nums">{Math.round(progress)}%</p>
+          <p className="text-sm font-bold tabular-nums">{Math.round(progress)}%</p>
         </div>
         <ProgressBar value={grandTotalSpent} max={grandTotalBudget} />
       </div>
@@ -99,7 +99,7 @@ export default function SummaryPage() {
 
       {tree.length === 0 && (
         <div className="rounded-xl bg-surface-container-low p-8 md:p-12 text-center">
-          <p className="font-heading text-lg text-muted-foreground italic">
+          <p className="text-lg text-muted-foreground italic">
             Add budget items to see your summary here.
           </p>
         </div>

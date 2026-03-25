@@ -19,7 +19,7 @@ export function QuoteBlock({ quote, attribution, className }: QuoteBlockProps) {
 
   return (
     <div className={cn("rounded-xl bg-surface-container-low p-6 md:p-8 text-center", className)}>
-      <p className="font-heading italic text-lg text-muted-foreground leading-relaxed">
+      <p className="italic text-lg text-muted-foreground leading-relaxed">
         &ldquo;{selected.text}&rdquo;
       </p>
       {selected.author && (

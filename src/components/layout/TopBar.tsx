@@ -11,7 +11,7 @@ export function TopBar({ onMenuOpen }: TopBarProps) {
       <Button variant="ghost" size="icon" onClick={onMenuOpen}>
         <Icon name="menu" size="lg" />
       </Button>
-      <span className="ml-3 font-heading text-lg font-bold tracking-tight">
+      <span className="ml-3 text-lg font-bold tracking-tight">
         Wedding Planner
       </span>
     </header>
