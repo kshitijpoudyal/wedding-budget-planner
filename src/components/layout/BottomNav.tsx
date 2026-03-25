@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils"
 
 const navItems: { to: string; label: string; icon: IconName }[] = [
   { to: "/budget", label: "Budget", icon: "payments" },
-  { to: "/people", label: "People", icon: "group" },
   { to: "/", label: "Home", icon: "home" },
   { to: "/summary", label: "Summary", icon: "auto_graph" },
   { to: "/settings", label: "Settings", icon: "settings" },

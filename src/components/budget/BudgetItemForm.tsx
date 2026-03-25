@@ -43,7 +43,7 @@ export function BudgetItemForm({
   isParent = false,
 }: BudgetItemFormProps) {
   const { data: settings } = useSettings()
-  const currency = settings?.currency ?? "NPR"
+  const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
   const currencyLabel = currency === "USD" ? "$" : "रु"
 
@@ -56,7 +56,7 @@ export function BudgetItemForm({
     if (open) {
       if (item) {
         setName(item.name)
-        // Convert stored NPR to display currency
+        // Convert stored USD to display currency
         setBudgetAmount(String(Math.round(toDisplayAmount(item.budgetAmount, currency, rate) * 100) / 100))
         setSpentAmount(String(Math.round(toDisplayAmount(item.spentAmount, currency, rate) * 100) / 100))
         setStatus(item.status)
@@ -71,7 +71,7 @@ export function BudgetItemForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Convert user-entered display currency back to NPR for storage
+    // Convert user-entered display currency back to USD for storage
     onSubmit({
       name: name.trim(),
       budgetAmount: toStorageAmount(Number(budgetAmount) || 0, currency, rate),
@@ -139,6 +139,7 @@ export function BudgetItemForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>

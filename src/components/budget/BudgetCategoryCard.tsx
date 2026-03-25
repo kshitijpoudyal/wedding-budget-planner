@@ -1,16 +1,18 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Icon } from "@/components/ui/icon"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { BudgetSubItemCard } from "./BudgetSubItemCard"
 import { CategoryActionMenu } from "./CategoryActionMenu"
+import { sortNodes } from "./sortNodes"
 import { formatCurrency } from "@/lib/currency"
 import { useSettings } from "@/hooks/useSettings"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 
 type BudgetCategoryCardProps = {
   node: BudgetTreeNode
+  sort: string
   onEdit: (node: BudgetTreeNode) => void
   onAddChild: (parentId: string) => void
   onDelete: (id: string) => void
@@ -19,6 +21,7 @@ type BudgetCategoryCardProps = {
 
 export function BudgetCategoryCard({
   node,
+  sort,
   onEdit,
   onAddChild,
   onDelete,
@@ -27,11 +30,12 @@ export function BudgetCategoryCard({
   const [expanded, setExpanded] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const { data: settings } = useSettings()
-  const currency = settings?.currency ?? "NPR"
+  const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
 
   const { item, children, totalBudget, totalSpent } = node
   const hasChildren = children.length > 0
+  const sortedChildren = useMemo(() => sortNodes(children, sort), [children, sort])
 
   return (
     <div className="rounded-xl bg-card shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low overflow-hidden transition-all duration-200">
@@ -69,11 +73,12 @@ export function BudgetCategoryCard({
 
       {expanded && hasChildren && (
         <div className="px-4 pb-4 md:px-5 md:pb-5 space-y-2">
-          {children.map((child) => (
+          {sortedChildren.map((child) => (
             <BudgetSubItemCard
               key={child.item.id}
               node={child}
               depth={1}
+              sort={sort}
               onEdit={onEdit}
               onAddChild={onAddChild}
               onDelete={onDelete}
@@ -97,8 +102,8 @@ export function BudgetCategoryCard({
         title="Delete Budget Item"
         description={
           hasChildren
-            ? `This will delete "${item.name}" and all ${children.length} child item(s) along with their assignments.`
-            : `This will permanently delete "${item.name}" and its assignments.`
+            ? `This will delete "${item.name}" and all ${children.length} child item(s).`
+            : `This will permanently delete "${item.name}".`
         }
         confirmLabel="Delete"
         loading={deleteLoading}

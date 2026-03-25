@@ -6,21 +6,9 @@ export type BudgetItem = {
   budgetAmount: number
   spentAmount: number
   parentId: string | null
-  status: "active" | "pending" | "closed"
+  status: "draft" | "active" | "pending" | "closed"
   createdAt: Timestamp
   updatedAt: Timestamp
-}
-
-export type Person = {
-  id: string
-  name: string
-  createdAt: Timestamp
-}
-
-export type Assignment = {
-  id: string
-  budgetItemId: string
-  personId: string
 }
 
 export type Settings = {
@@ -29,5 +17,3 @@ export type Settings = {
 }
 
 export type BudgetItemInput = Omit<BudgetItem, "id" | "createdAt" | "updatedAt">
-
-export type PersonInput = Omit<Person, "id" | "createdAt">

@@ -1,9 +1,9 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { AssignPeople } from "./AssignPeople"
 import { CategoryActionMenu } from "./CategoryActionMenu"
+import { sortNodes } from "./sortNodes"
 import { formatCurrency } from "@/lib/currency"
 import { useSettings } from "@/hooks/useSettings"
 import { cn } from "@/lib/utils"
@@ -12,6 +12,7 @@ import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 type BudgetSubItemCardProps = {
   node: BudgetTreeNode
   depth: number
+  sort: string
   onEdit: (node: BudgetTreeNode) => void
   onAddChild: (parentId: string) => void
   onDelete: (id: string) => void
@@ -21,6 +22,7 @@ type BudgetSubItemCardProps = {
 export function BudgetSubItemCard({
   node,
   depth,
+  sort,
   onEdit,
   onAddChild,
   onDelete,
@@ -28,11 +30,12 @@ export function BudgetSubItemCard({
 }: BudgetSubItemCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const { data: settings } = useSettings()
-  const currency = settings?.currency ?? "NPR"
+  const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
 
-  const { item, children, totalBudget, totalSpent, isLeaf } = node
+  const { item, children, totalBudget, totalSpent } = node
   const hasChildren = children.length > 0
+  const sortedChildren = useMemo(() => sortNodes(children, sort), [children, sort])
 
   return (
     <div className={cn(depth > 1 && "pl-4")}>
@@ -54,7 +57,6 @@ export function BudgetSubItemCard({
 
         <div className="flex items-center gap-2 mt-2 flex-wrap">
           <StatusBadge status={item.status} />
-          {isLeaf && <AssignPeople budgetItemId={item.id} />}
         </div>
 
         <ProgressBar value={totalSpent} max={totalBudget} className="mt-2" />
@@ -62,11 +64,12 @@ export function BudgetSubItemCard({
 
       {hasChildren && (
         <div className="mt-2 space-y-2">
-          {children.map((child) => (
+          {sortedChildren.map((child) => (
             <BudgetSubItemCard
               key={child.item.id}
               node={child}
               depth={depth + 1}
+              sort={sort}
               onEdit={onEdit}
               onAddChild={onAddChild}
               onDelete={onDelete}
@@ -82,8 +85,8 @@ export function BudgetSubItemCard({
         title="Delete Budget Item"
         description={
           hasChildren
-            ? `This will delete "${item.name}" and all ${children.length} child item(s) along with their assignments.`
-            : `This will permanently delete "${item.name}" and its assignments.`
+            ? `This will delete "${item.name}" and all ${children.length} child item(s).`
+            : `This will permanently delete "${item.name}".`
         }
         confirmLabel="Delete"
         loading={deleteLoading}

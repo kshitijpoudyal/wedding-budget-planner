@@ -16,7 +16,7 @@ export function BudgetFinancialOverview({
   progress,
 }: BudgetFinancialOverviewProps) {
   const { data: settings } = useSettings()
-  const currency = settings?.currency ?? "NPR"
+  const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
 
   return (

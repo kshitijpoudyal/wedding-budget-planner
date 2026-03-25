@@ -3,8 +3,8 @@ import { db } from "@/lib/firebase"
 import type { Settings } from "@/types"
 
 const DEFAULT_SETTINGS: Settings = {
-  currency: "NPR",
-  exchangeRate: 1,
+  currency: "USD",
+  exchangeRate: 133.5,
 }
 
 function settingsDocPath(userId: string) {

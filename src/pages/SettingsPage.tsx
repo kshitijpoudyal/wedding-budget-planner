@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const [currency, setCurrency] = useState<Settings["currency"]>("NPR")
+  const [currency, setCurrency] = useState<Settings["currency"]>("USD")
   const [exchangeRate, setExchangeRate] = useState("")
   const [saved, setSaved] = useState(false)
 

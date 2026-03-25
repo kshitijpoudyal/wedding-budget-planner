@@ -24,6 +24,10 @@ export function FilterBar({ sortValue, onSortChange, className }: FilterBarProps
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="default">Default</SelectItem>
+          <SelectItem value="alpha-asc">Name (A → Z)</SelectItem>
+          <SelectItem value="alpha-desc">Name (Z → A)</SelectItem>
+          <SelectItem value="date-desc">Recently Modified</SelectItem>
+          <SelectItem value="date-asc">Oldest Modified</SelectItem>
           <SelectItem value="budget-desc">Budget (High → Low)</SelectItem>
           <SelectItem value="budget-asc">Budget (Low → High)</SelectItem>
           <SelectItem value="status">Status</SelectItem>

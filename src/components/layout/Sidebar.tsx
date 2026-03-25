@@ -13,7 +13,6 @@ import { queryClient } from "@/lib/queryClient"
 
 const navItems: { to: string; label: string; icon: IconName }[] = [
   { to: "/budget", label: "Budget", icon: "payments" },
-  { to: "/people", label: "People", icon: "group" },
   { to: "/summary", label: "Summary", icon: "auto_graph" },
   { to: "/settings", label: "Settings", icon: "settings" },
 ]

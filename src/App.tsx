@@ -9,7 +9,6 @@ import { AppLayout } from "@/components/layout/AppLayout"
 import BudgetPage from "@/pages/BudgetPage"
 import LoginPage from "@/pages/LoginPage"
 
-const PeoplePage = lazy(() => import("@/pages/PeoplePage"))
 const SummaryPage = lazy(() => import("@/pages/SummaryPage"))
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"))
 
@@ -33,7 +32,6 @@ function App() {
                 <Route element={<AppLayout />}>
                   <Route path="/" element={<Navigate to="/budget" replace />} />
                   <Route path="/budget" element={<BudgetPage />} />
-                  <Route path="/people" element={<Suspense fallback={<PageFallback />}><PeoplePage /></Suspense>} />
                   <Route path="/summary" element={<Suspense fallback={<PageFallback />}><SummaryPage /></Suspense>} />
                   <Route path="/settings" element={<Suspense fallback={<PageFallback />}><SettingsPage /></Suspense>} />
                 </Route>

@@ -11,7 +11,7 @@ export default function SummaryPage() {
   const { tree, grandTotalBudget, grandTotalSpent, remaining, progress, isLoading } =
     useBudgetTree()
   const { data: settings } = useSettings()
-  const currency = settings?.currency ?? "NPR"
+  const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
 
   // Status grouping

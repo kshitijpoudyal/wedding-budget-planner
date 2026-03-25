@@ -34,7 +34,6 @@ export function useDeleteBudgetItem() {
     mutationFn: (id: string) => cascadeDeleteBudgetItem(userId, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budgetItems", userId] })
-      queryClient.invalidateQueries({ queryKey: ["assignments", userId] })
     },
   })
 }

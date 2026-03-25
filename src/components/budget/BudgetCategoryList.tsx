@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { SectionHeading } from "@/components/ui/section-heading"
 import { FilterBar } from "@/components/ui/filter-bar"
 import { BudgetCategoryCard } from "./BudgetCategoryCard"
+import { sortNodes } from "./sortNodes"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 
 type BudgetCategoryListProps = {
@@ -15,8 +16,6 @@ type BudgetCategoryListProps = {
   onAddRoot: () => void
 }
 
-const statusOrder: Record<string, number> = { active: 0, pending: 1, closed: 2 }
-
 export function BudgetCategoryList({
   tree,
   onEdit,
@@ -25,23 +24,9 @@ export function BudgetCategoryList({
   deleteLoading,
   onAddRoot,
 }: BudgetCategoryListProps) {
-  const [sort, setSort] = useState("default")
+  const [sort, setSort] = useState("budget-desc")
 
-  const sortedTree = useMemo(() => {
-    const items = [...tree]
-    switch (sort) {
-      case "budget-desc":
-        return items.sort((a, b) => b.totalBudget - a.totalBudget)
-      case "budget-asc":
-        return items.sort((a, b) => a.totalBudget - b.totalBudget)
-      case "status":
-        return items.sort(
-          (a, b) => (statusOrder[a.item.status] ?? 9) - (statusOrder[b.item.status] ?? 9),
-        )
-      default:
-        return items
-    }
-  }, [tree, sort])
+  const sortedTree = useMemo(() => sortNodes(tree, sort), [tree, sort])
 
   return (
     <section className="space-y-4">
@@ -71,6 +56,7 @@ export function BudgetCategoryList({
             <BudgetCategoryCard
               key={node.item.id}
               node={node}
+              sort={sort}
               onEdit={onEdit}
               onAddChild={onAddChild}
               onDelete={onDelete}

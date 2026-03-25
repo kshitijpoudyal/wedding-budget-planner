@@ -1,9 +1,7 @@
 import { getAllBudgetItems, deleteBudgetItem } from "./budgetItems"
-import { deletePerson } from "./people"
-import { deleteAssignmentsByBudgetItem, deleteAssignmentsByPerson } from "./assignments"
 
 /**
- * Delete a budget item and all its descendants + related assignments.
+ * Delete a budget item and all its descendants.
  */
 export async function cascadeDeleteBudgetItem(userId: string, itemId: string): Promise<void> {
   const allItems = await getAllBudgetItems(userId)
@@ -23,17 +21,6 @@ export async function cascadeDeleteBudgetItem(userId: string, itemId: string): P
   collectDescendants(itemId)
 
   await Promise.all(
-    Array.from(idsToDelete).map(async (id) => {
-      await deleteAssignmentsByBudgetItem(userId, id)
-      await deleteBudgetItem(userId, id)
-    }),
+    Array.from(idsToDelete).map((id) => deleteBudgetItem(userId, id)),
   )
-}
-
-/**
- * Delete a person and all their assignments.
- */
-export async function cascadeDeletePerson(userId: string, personId: string): Promise<void> {
-  await deleteAssignmentsByPerson(userId, personId)
-  await deletePerson(userId, personId)
 }
