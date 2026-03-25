@@ -55,12 +55,14 @@ export function BudgetCategoryCard({
               <span>Spent: {formatCurrency(totalSpent, currency, rate)}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-            <CategoryActionMenu
-              onEdit={() => onEdit(node)}
-              onAddChild={() => onAddChild(item.id)}
-              onDelete={() => setShowDeleteConfirm(true)}
-            />
+          <div className="flex items-center gap-1 shrink-0">
+            <div onClick={(e) => e.stopPropagation()}>
+              <CategoryActionMenu
+                onEdit={() => onEdit(node)}
+                onAddChild={() => onAddChild(item.id)}
+                onDelete={() => setShowDeleteConfirm(true)}
+              />
+            </div>
             <Icon
               name={expanded ? "expand_less" : "expand_more"}
               size="lg"
