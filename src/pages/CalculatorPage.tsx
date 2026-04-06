@@ -148,7 +148,7 @@ export default function CalculatorPage() {
       />
 
       {/* Calculator Card */}
-      <div className="rounded-xl md:rounded-2xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4 md:space-y-5">
+      <div className="rounded-xl md:rounded-2xl bg-card glass-card p-4 md:p-5 space-y-4 md:space-y-5">
         {/* Display */}
         <div className="p-3 md:p-4 rounded-xl bg-surface-container-high dark:bg-surface-container min-h-[80px] md:min-h-[100px] flex flex-col justify-end items-end">
           {operation && previousValue !== null && (

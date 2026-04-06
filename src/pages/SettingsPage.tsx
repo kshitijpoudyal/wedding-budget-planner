@@ -66,7 +66,7 @@ export default function SettingsPage() {
       <SectionHeading title="Settings" subtitle="Configure your planner" />
 
       {/* Currency */}
-      <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
+      <section className="rounded-xl bg-card glass-card p-4 md:p-5 space-y-4">
         <h3 className="text-base font-bold">Currency</h3>
 
         <div className="space-y-2">
@@ -107,7 +107,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Appearance */}
-      <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
+      <section className="rounded-xl bg-card glass-card p-4 md:p-5 space-y-4">
         <h3 className="text-base font-bold">Appearance</h3>
         <div className="flex items-center justify-between">
           <div>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Account */}
-      <section className="rounded-xl bg-card p-4 md:p-5 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-4">
+      <section className="rounded-xl bg-card glass-card p-4 md:p-5 space-y-4">
         <h3 className="text-base font-bold">Account</h3>
         <div className="flex items-center justify-between">
           <div>

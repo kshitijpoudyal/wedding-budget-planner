@@ -65,7 +65,7 @@ export function BudgetSubItemCard({
     <div className={cn(depth > 1 && "pl-4")}>
       <div
         className={cn(
-          "rounded-xl bg-surface-container-low p-3 md:p-4 transition-colors duration-200",
+          "rounded-xl bg-surface-container glass-surface p-3 md:p-4 transition-colors duration-200",
           selectionMode && "cursor-pointer",
           selectionMode && isSelected && "ring-2 ring-primary"
         )}

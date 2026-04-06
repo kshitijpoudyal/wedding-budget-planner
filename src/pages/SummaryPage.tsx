@@ -74,7 +74,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Overall progress */}
-      <div className="rounded-xl bg-card p-4 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low">
+      <div className="rounded-xl bg-card glass-card p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-medium">Overall Progress</p>
           <p className="text-sm font-bold tabular-nums">{Math.round(progress)}%</p>
@@ -110,7 +110,7 @@ export default function SummaryPage() {
       )}
 
       {tree.length === 0 && (
-        <div className="rounded-xl bg-surface-container-low p-8 md:p-12 text-center">
+        <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
           <p className="text-lg text-muted-foreground italic">
             Add budget items to see your summary here.
           </p>
@@ -145,7 +145,7 @@ export default function SummaryPage() {
               {varianceItems.map((item) => (
                 <div
                   key={item.item.id}
-                  className="flex items-center justify-between gap-2 rounded-lg bg-surface-container-low p-3"
+                  className="flex items-center justify-between gap-2 rounded-lg bg-surface-container-low glass-surface p-3"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{item.item.name}</p>

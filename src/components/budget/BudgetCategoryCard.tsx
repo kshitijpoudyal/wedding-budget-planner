@@ -55,7 +55,7 @@ export function BudgetCategoryCard({
 
   return (
     <div className={cn(
-      "rounded-xl bg-card shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low overflow-hidden transition-all duration-200",
+      "rounded-xl bg-card glass-card overflow-hidden transition-all duration-200 border-l-[3px] border-l-primary/40",
       selectionMode && isSelected && "ring-2 ring-primary"
     )}>
       <button

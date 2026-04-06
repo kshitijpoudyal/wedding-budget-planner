@@ -18,7 +18,7 @@ export function QuoteBlock({ quote, attribution, className }: QuoteBlockProps) {
     : quotes[Math.floor(Date.now() / 86400000) % quotes.length]
 
   return (
-    <div className={cn("rounded-xl bg-surface-container-low p-6 md:p-8 text-center", className)}>
+    <div className={cn("rounded-xl bg-surface-container-low glass-surface p-6 md:p-8 text-center", className)}>
       <p className="italic text-lg text-muted-foreground leading-relaxed">
         &ldquo;{selected.text}&rdquo;
       </p>

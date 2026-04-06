@@ -106,7 +106,7 @@ export function PaymentHistory({
 
           <div className="mt-6 space-y-4">
             {/* Total summary */}
-            <div className="rounded-lg bg-surface-container-low p-4">
+            <div className="rounded-lg bg-surface-container-low glass-surface p-4">
               <p className="text-sm text-muted-foreground">Total Paid</p>
               <p className="text-2xl font-bold tabular-nums">
                 {formatCurrency(totalPaid, currency, rate)}
@@ -209,7 +209,7 @@ export function PaymentHistory({
                 payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between gap-2 rounded-lg bg-surface-container-low p-3"
+                    className="flex items-center justify-between gap-2 rounded-lg bg-surface-container-low glass-surface p-3"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="font-medium tabular-nums">

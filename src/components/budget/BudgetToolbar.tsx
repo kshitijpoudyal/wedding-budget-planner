@@ -76,12 +76,27 @@ export function BudgetToolbar({
     onSortChange(`${sortBy}-${isAsc ? "desc" : "asc"}`)
   }
 
+  // Cycle through sort options on mobile
+  const cycleSortOption = () => {
+    const currentIndex = SORT_OPTIONS.findIndex((opt) => opt.value === sortBy)
+    const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length
+    const nextSort = SORT_OPTIONS[nextIndex].value
+    if (nextSort === "status") {
+      onSortChange("status")
+    } else {
+      onSortChange(`${nextSort}-${direction}`)
+    }
+  }
+
+  // Get current sort icon for mobile button
+  const currentSortIcon = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.icon ?? "sort"
+
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("rounded-xl bg-surface-container-low glass-surface p-2 space-y-2", className)}>
       {/* Main toolbar row */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2">
         {/* Search */}
-        <div className="relative flex-1 min-w-[180px] max-w-xs">
+        <div className="relative flex-1 min-w-0 sm:max-w-xs">
           <Icon
             name="search"
             size="sm"
@@ -92,14 +107,25 @@ export function BudgetToolbar({
             placeholder="Search..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-8 h-9"
+            className="pl-8"
           />
         </div>
 
-        {/* Sort */}
-        <div className="flex items-center">
+        {/* Sort — mobile: icon button that cycles options */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={cycleSortOption}
+          className="sm:hidden"
+          title={`Sort by ${SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label}`}
+        >
+          <Icon name={currentSortIcon} size="md" />
+        </Button>
+
+        {/* Sort — desktop: select + direction toggle */}
+        <div className="hidden sm:flex items-center">
           <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger size="sm" className="h-9 w-auto gap-1 rounded-r-none border-r-0">
+            <SelectTrigger className="w-auto gap-1 rounded-r-none border-r-0">
               <Icon name="sort" size="sm" className="text-muted-foreground" />
               <SelectValue />
             </SelectTrigger>
@@ -117,58 +143,60 @@ export function BudgetToolbar({
           {sortBy !== "status" && (
             <Button
               variant="outline"
-              size="sm"
               onClick={toggleDirection}
-              className="h-9 px-2 rounded-l-none"
+              className="px-2 rounded-l-none"
             >
               <Icon name={isAsc ? "arrow_upward" : "arrow_downward"} size="sm" />
             </Button>
           )}
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1 hidden sm:block" />
+        {/* Right-side actions */}
+        <div className="flex items-center gap-1 ml-auto">
+          {/* Selection toggle */}
+          {hasItems && (
+            <Button
+              variant={selectionMode ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => {
+                if (selectionMode) {
+                  onClearSelection()
+                  onSelectionModeChange(false)
+                } else {
+                  onSelectionModeChange(true)
+                }
+              }}
+              className="sm:w-auto sm:px-2.5 sm:gap-1.5"
+            >
+              <Icon name={selectionMode ? "close" : "checklist"} size="md" className="sm:[font-size:14px]" />
+              <span className="hidden sm:inline text-sm">
+                {selectionMode ? "Cancel" : "Select"}
+              </span>
+            </Button>
+          )}
 
-        {/* Selection toggle */}
-        {hasItems && (
+          {/* Add button */}
           <Button
-            variant={selectionMode ? "secondary" : "ghost"}
-            size="sm"
-            onClick={() => {
-              if (selectionMode) {
-                onClearSelection()
-                onSelectionModeChange(false)
-              } else {
-                onSelectionModeChange(true)
-              }
-            }}
-            className="h-9"
+            onClick={onAdd}
+            size="icon"
+            className="sm:w-auto sm:px-2.5 sm:gap-1.5"
           >
-            <Icon name={selectionMode ? "close" : "checklist"} size="sm" />
-            <span className="ml-1 hidden sm:inline">
-              {selectionMode ? "Cancel" : "Select"}
-            </span>
+            <Icon name="add" size="md" className="sm:[font-size:14px]" />
+            <span className="hidden sm:inline text-sm">Add</span>
           </Button>
-        )}
-
-        {/* Add button */}
-        <Button onClick={onAdd} size="sm" className="h-9">
-          <Icon name="add" size="sm" />
-          <span className="ml-1 hidden sm:inline">Add</span>
-        </Button>
+        </div>
       </div>
 
-      {/* Selection row - only shown in selection mode */}
+      {/* Selection row */}
       {selectionMode && hasItems && (
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-2 text-sm px-0.5">
           <span className="text-muted-foreground">
             {selectedCount} of {totalCount} selected
           </span>
           <Button
             variant="ghost"
-            size="sm"
+            size="xs"
             onClick={selectedCount === totalCount ? onClearSelection : onSelectAll}
-            className="h-7 px-2"
           >
             {selectedCount === totalCount ? "Deselect all" : "Select all"}
           </Button>

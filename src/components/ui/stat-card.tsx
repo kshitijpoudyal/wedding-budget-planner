@@ -13,7 +13,7 @@ export function StatCard({ label, value, icon, className, variant = "default" }:
   return (
     <div
       className={cn(
-        "rounded-xl bg-card p-4 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+        "rounded-xl bg-card glass-card p-4",
         className,
       )}
     >

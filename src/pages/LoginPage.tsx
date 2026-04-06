@@ -38,7 +38,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-xl bg-card p-6 shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low space-y-6">
+      <div className="w-full max-w-sm rounded-xl bg-card glass-card p-6 space-y-6">
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">Wedding Planner</h1>
           <p className="text-sm text-muted-foreground">Sign in to manage your budget</p>

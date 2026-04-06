@@ -37,7 +37,7 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-col h-screen bg-surface-container-low text-sidebar-foreground transition-all duration-200 backdrop-blur-xl",
+        "hidden md:flex flex-col h-screen bg-sidebar text-sidebar-foreground transition-all duration-200 backdrop-blur-xl border-r border-white/10 dark:border-white/[0.04]",
         collapsed ? "w-[68px]" : "w-[260px]",
       )}
     >

@@ -109,7 +109,7 @@ export default function BudgetPage() {
       <Button
         onClick={handleAdd}
         size="icon"
-        className="md:hidden fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-[0_20px_40px_rgba(128,82,83,0.06)] z-40"
+        className="md:hidden fixed bottom-20 right-4 h-14 w-14 rounded-full glass-card z-40"
       >
         <Icon name="add" size="xl" />
       </Button>

@@ -25,7 +25,7 @@ export function BulkActionBar({
   if (selectedCount === 0) return null
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl bg-card px-4 py-3 shadow-lg border border-border dark:bg-surface-container">
+    <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl bg-card glass-card px-4 py-3">
       <Button
         variant="ghost"
         size="icon"

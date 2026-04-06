@@ -138,7 +138,7 @@ export function BudgetCategoryList({
       />
 
       {sortedTree.length === 0 && tree.length === 0 ? (
-        <div className="rounded-xl bg-surface-container-low p-8 md:p-12 text-center">
+        <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
           <p className="text-lg text-muted-foreground italic">
             Your celebration awaits its first chapter.
           </p>
@@ -148,7 +148,7 @@ export function BudgetCategoryList({
           </Button>
         </div>
       ) : sortedTree.length === 0 ? (
-        <div className="rounded-xl bg-surface-container-low p-8 md:p-12 text-center">
+        <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
           <Icon name="search_off" size="lg" className="text-muted-foreground mx-auto mb-2" />
           <p className="text-lg text-muted-foreground italic">
             No items match your filters
