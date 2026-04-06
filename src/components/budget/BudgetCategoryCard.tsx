@@ -8,6 +8,7 @@ import { CategoryActionMenu } from "./CategoryActionMenu"
 import { sortNodes } from "./sortNodes"
 import { formatCurrency } from "@/lib/currency"
 import { useSettings } from "@/hooks/useSettings"
+import { cn } from "@/lib/utils"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 
 type BudgetCategoryCardProps = {
@@ -17,6 +18,9 @@ type BudgetCategoryCardProps = {
   onAddChild: (parentId: string) => void
   onDelete: (id: string) => void
   deleteLoading: boolean
+  selectionMode?: boolean
+  selectedIds?: Set<string>
+  onToggleSelection?: (id: string) => void
 }
 
 export function BudgetCategoryCard({
@@ -26,6 +30,9 @@ export function BudgetCategoryCard({
   onAddChild,
   onDelete,
   deleteLoading,
+  selectionMode = false,
+  selectedIds = new Set(),
+  onToggleSelection,
 }: BudgetCategoryCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -36,15 +43,39 @@ export function BudgetCategoryCard({
   const { item, children, totalBudget, totalSpent } = node
   const hasChildren = children.length > 0
   const sortedChildren = useMemo(() => sortNodes(children, sort), [children, sort])
+  const isSelected = selectedIds.has(item.id)
+
+  const handleClick = () => {
+    if (selectionMode && onToggleSelection) {
+      onToggleSelection(item.id)
+    } else {
+      setExpanded(!expanded)
+    }
+  }
 
   return (
-    <div className="rounded-xl bg-card shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low overflow-hidden transition-all duration-200">
+    <div className={cn(
+      "rounded-xl bg-card shadow-[0_20px_40px_rgba(128,82,83,0.06)] dark:shadow-none dark:bg-surface-container-low overflow-hidden transition-all duration-200",
+      selectionMode && isSelected && "ring-2 ring-primary"
+    )}>
       <button
         type="button"
         className="w-full text-left p-4 md:p-5"
-        onClick={() => setExpanded(!expanded)}
+        onClick={handleClick}
       >
         <div className="flex items-start justify-between gap-2">
+          {selectionMode && (
+            <div
+              className={cn(
+                "shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors mr-2",
+                isSelected
+                  ? "bg-primary border-primary text-white"
+                  : "border-muted-foreground/40"
+              )}
+            >
+              {isSelected && <Icon name="check" size="sm" />}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-bold truncate">{item.name}</h3>
@@ -56,18 +87,22 @@ export function BudgetCategoryCard({
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <div onClick={(e) => e.stopPropagation()}>
-              <CategoryActionMenu
-                onEdit={() => onEdit(node)}
-                onAddChild={() => onAddChild(item.id)}
-                onDelete={() => setShowDeleteConfirm(true)}
+            {!selectionMode && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <CategoryActionMenu
+                  onEdit={() => onEdit(node)}
+                  onAddChild={() => onAddChild(item.id)}
+                  onDelete={() => setShowDeleteConfirm(true)}
+                />
+              </div>
+            )}
+            {!selectionMode && (
+              <Icon
+                name={expanded ? "expand_less" : "expand_more"}
+                size="lg"
+                className="text-muted-foreground"
               />
-            </div>
-            <Icon
-              name={expanded ? "expand_less" : "expand_more"}
-              size="lg"
-              className="text-muted-foreground"
-            />
+            )}
           </div>
         </div>
         <ProgressBar value={totalSpent} max={totalBudget} className="mt-3" />
@@ -85,6 +120,9 @@ export function BudgetCategoryCard({
               onAddChild={onAddChild}
               onDelete={onDelete}
               deleteLoading={deleteLoading}
+              selectionMode={selectionMode}
+              selectedIds={selectedIds}
+              onToggleSelection={onToggleSelection}
             />
           ))}
         </div>

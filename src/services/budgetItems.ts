@@ -6,6 +6,7 @@ import {
   updateDoc,
   deleteDoc,
   serverTimestamp,
+  writeBatch,
 } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { userCollection } from "@/lib/userPath"
@@ -38,4 +39,23 @@ export async function updateBudgetItem(
 
 export async function deleteBudgetItem(userId: string, id: string): Promise<void> {
   await deleteDoc(doc(db, userCollection(userId, "budgetItems"), id))
+}
+
+export async function bulkUpdateBudgetItems(
+  userId: string,
+  ids: string[],
+  data: Partial<BudgetItemInput>,
+): Promise<void> {
+  const batch = writeBatch(db)
+  const colPath = userCollection(userId, "budgetItems")
+  
+  for (const id of ids) {
+    const docRef = doc(db, colPath, id)
+    batch.update(docRef, {
+      ...data,
+      updatedAt: serverTimestamp(),
+    })
+  }
+  
+  await batch.commit()
 }

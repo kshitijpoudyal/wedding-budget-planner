@@ -11,8 +11,9 @@ import {
   useCreateBudgetItem,
   useUpdateBudgetItem,
   useDeleteBudgetItem,
+  useBulkUpdateStatus,
 } from "@/hooks/useBudgetItemMutations"
-import type { BudgetItemInput } from "@/types"
+import type { BudgetItem, BudgetItemInput } from "@/types"
 
 export default function BudgetPage() {
   const { tree, grandTotalBudget, grandTotalSpent, progress, isLoading, isError, error } =
@@ -21,6 +22,7 @@ export default function BudgetPage() {
   const createMutation = useCreateBudgetItem()
   const updateMutation = useUpdateBudgetItem()
   const deleteMutation = useDeleteBudgetItem()
+  const bulkUpdateMutation = useBulkUpdateStatus()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingNode, setEditingNode] = useState<BudgetTreeNode | null>(null)
@@ -46,6 +48,10 @@ export default function BudgetPage() {
 
   const handleDelete = (id: string) => {
     deleteMutation.mutate(id)
+  }
+
+  const handleBulkStatusChange = (ids: string[], status: BudgetItem["status"]) => {
+    bulkUpdateMutation.mutate({ ids, status })
   }
 
   const handleSubmit = (data: BudgetItemInput) => {
@@ -93,6 +99,8 @@ export default function BudgetPage() {
         onDelete={handleDelete}
         deleteLoading={deleteMutation.isPending}
         onAddRoot={handleAdd}
+        onBulkStatusChange={handleBulkStatusChange}
+        bulkUpdateLoading={bulkUpdateMutation.isPending}
       />
 
       <QuoteBlock />

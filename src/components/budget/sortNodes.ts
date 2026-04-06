@@ -1,6 +1,6 @@
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 
-const statusOrder: Record<string, number> = { draft: 0, active: 1, pending: 2, closed: 3 }
+const statusOrder: Record<string, number> = { draft: 0, finalized: 1 }
 
 export function sortNodes(nodes: BudgetTreeNode[], sort: string): BudgetTreeNode[] {
   if (sort === "default") return nodes

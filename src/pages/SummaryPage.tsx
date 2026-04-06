@@ -1,3 +1,4 @@
+import { Icon } from "@/components/ui/icon"
 import { SectionHeading } from "@/components/ui/section-heading"
 import { StatCard } from "@/components/ui/stat-card"
 import { ProgressBar } from "@/components/ui/progress-bar"
@@ -6,6 +7,22 @@ import { CategoryBreakdown } from "@/components/summary/CategoryBreakdown"
 import { useBudgetTree } from "@/hooks/useBudgetTree"
 import { useSettings } from "@/hooks/useSettings"
 import { formatCurrency } from "@/lib/currency"
+import { cn } from "@/lib/utils"
+import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
+
+// Helper to collect all leaf nodes (items without children)
+function collectLeafNodes(nodes: BudgetTreeNode[]): BudgetTreeNode[] {
+  const leaves: BudgetTreeNode[] = []
+  function traverse(node: BudgetTreeNode) {
+    if (node.children.length === 0) {
+      leaves.push(node)
+    } else {
+      node.children.forEach(traverse)
+    }
+  }
+  nodes.forEach(traverse)
+  return leaves
+}
 
 export default function SummaryPage() {
   const { tree, grandTotalBudget, grandTotalSpent, remaining, progress, isLoading } =
@@ -77,21 +94,16 @@ export default function SummaryPage() {
       {tree.length > 0 && (
         <section className="space-y-4">
           <SectionHeading title="By Status" />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <StatCard
-              label="Active"
-              value={String(statusCounts.active || 0)}
+              label="Draft"
+              value={String(statusCounts.draft || 0)}
+              icon="edit_note"
+            />
+            <StatCard
+              label="Finalized"
+              value={String(statusCounts.finalized || 0)}
               icon="check_circle"
-            />
-            <StatCard
-              label="Pending"
-              value={String(statusCounts.pending || 0)}
-              icon="schedule"
-            />
-            <StatCard
-              label="Closed"
-              value={String(statusCounts.closed || 0)}
-              icon="lock"
             />
           </div>
         </section>
@@ -104,6 +116,65 @@ export default function SummaryPage() {
           </p>
         </div>
       )}
+
+      {/* Estimate vs Actual - Items with significant variance */}
+      {tree.length > 0 && (() => {
+        const leaves = collectLeafNodes(tree)
+        // Filter items with >10% variance where both budget and spent are > 0
+        const varianceItems = leaves
+          .filter((node) => {
+            const { budgetAmount, spentAmount } = node.item
+            if (budgetAmount <= 0 || spentAmount <= 0) return false
+            const variance = Math.abs((spentAmount - budgetAmount) / budgetAmount)
+            return variance > 0.1 // More than 10% difference
+          })
+          .map((node) => ({
+            ...node,
+            variance: node.item.spentAmount - node.item.budgetAmount,
+            variancePercent: ((node.item.spentAmount - node.item.budgetAmount) / node.item.budgetAmount) * 100,
+          }))
+          .sort((a, b) => Math.abs(b.variancePercent) - Math.abs(a.variancePercent))
+          .slice(0, 5) // Top 5 variances
+
+        if (varianceItems.length === 0) return null
+
+        return (
+          <section className="space-y-4">
+            <SectionHeading title="Estimate vs Actual" subtitle="Items with significant variance" />
+            <div className="space-y-2">
+              {varianceItems.map((item) => (
+                <div
+                  key={item.item.id}
+                  className="flex items-center justify-between gap-2 rounded-lg bg-surface-container-low p-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{item.item.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Budget: {formatCurrency(item.item.budgetAmount, currency, rate)} →
+                      Actual: {formatCurrency(item.item.spentAmount, currency, rate)}
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "flex items-center gap-1 text-sm font-medium shrink-0",
+                      item.variance > 0 ? "text-error" : "text-success"
+                    )}
+                  >
+                    <Icon
+                      name={item.variance > 0 ? "trending_up" : "trending_down"}
+                      size="sm"
+                    />
+                    <span>
+                      {item.variance > 0 ? "+" : ""}
+                      {Math.round(item.variancePercent)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      })()}
 
       <QuoteBlock
         quote="Beware of little expenses; a small leak will sink a great ship."

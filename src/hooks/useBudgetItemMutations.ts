@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useUserId } from "@/contexts/AuthContext"
-import { createBudgetItem, updateBudgetItem } from "@/services/budgetItems"
+import { createBudgetItem, updateBudgetItem, bulkUpdateBudgetItems } from "@/services/budgetItems"
 import { cascadeDeleteBudgetItem } from "@/services/cascadeDelete"
 import type { BudgetItemInput } from "@/types"
 
@@ -32,6 +32,18 @@ export function useDeleteBudgetItem() {
   const userId = useUserId()
   return useMutation({
     mutationFn: (id: string) => cascadeDeleteBudgetItem(userId, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["budgetItems", userId] })
+    },
+  })
+}
+
+export function useBulkUpdateStatus() {
+  const queryClient = useQueryClient()
+  const userId = useUserId()
+  return useMutation({
+    mutationFn: ({ ids, status }: { ids: string[]; status: BudgetItemInput["status"] }) =>
+      bulkUpdateBudgetItems(userId, ids, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budgetItems", userId] })
     },

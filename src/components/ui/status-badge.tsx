@@ -3,9 +3,7 @@ import type { BudgetItem } from "@/types"
 
 const variants: Record<BudgetItem["status"], string> = {
   draft: "bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground",
-  active: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
-  pending: "bg-tertiary-container text-tertiary dark:bg-tertiary/20 dark:text-tertiary",
-  closed: "bg-surface-container-high text-muted-foreground dark:bg-surface-container dark:text-muted-foreground",
+  finalized: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
 }
 
 type StatusBadgeProps = {
