@@ -11,6 +11,7 @@ import LoginPage from "@/pages/LoginPage"
 
 const SummaryPage = lazy(() => import("@/pages/SummaryPage"))
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"))
+const CalculatorPage = lazy(() => import("@/pages/CalculatorPage"))
 
 function PageFallback() {
   return (
@@ -33,6 +34,7 @@ function App() {
                   <Route path="/" element={<Navigate to="/budget" replace />} />
                   <Route path="/budget" element={<BudgetPage />} />
                   <Route path="/summary" element={<Suspense fallback={<PageFallback />}><SummaryPage /></Suspense>} />
+                  <Route path="/calculator" element={<Suspense fallback={<PageFallback />}><CalculatorPage /></Suspense>} />
                   <Route path="/settings" element={<Suspense fallback={<PageFallback />}><SettingsPage /></Suspense>} />
                 </Route>
               </Route>
