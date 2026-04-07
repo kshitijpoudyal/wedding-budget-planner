@@ -32,14 +32,11 @@ function collectAllIds(nodes: BudgetTreeNode[]): string[] {
 }
 
 // Helper to filter tree nodes by search query (matches name, notes, vendorName)
-function filterTree(nodes: BudgetTreeNode[], query: string, statusFilter: string): BudgetTreeNode[] {
+function filterTree(nodes: BudgetTreeNode[], query: string): BudgetTreeNode[] {
   const lowerQuery = query.toLowerCase().trim()
 
   function matchesQuery(node: BudgetTreeNode): boolean {
     const { item } = node
-    // Status filter check
-    if (statusFilter !== "all" && item.status !== statusFilter) return false
-    // Search check (if no query, all pass)
     if (!lowerQuery) return true
     if (item.name.toLowerCase().includes(lowerQuery)) return true
     if (item.notes?.toLowerCase().includes(lowerQuery)) return true
@@ -79,13 +76,12 @@ export function BudgetCategoryList({
 }: BudgetCategoryListProps) {
   const [sort, setSort] = useState("budget-desc")
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [selectionMode, setSelectionMode] = useState(false)
 
   const filteredTree = useMemo(
-    () => filterTree(tree, search, statusFilter),
-    [tree, search, statusFilter]
+    () => filterTree(tree, search),
+    [tree, search]
   )
   const sortedTree = useMemo(() => sortNodes(filteredTree, sort), [filteredTree, sort])
   const allIds = useMemo(() => collectAllIds(filteredTree), [filteredTree])
@@ -125,8 +121,6 @@ export function BudgetCategoryList({
         onSearchChange={setSearch}
         sortValue={sort}
         onSortChange={setSort}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
         selectionMode={selectionMode}
         onSelectionModeChange={setSelectionMode}
         selectedCount={selectedIds.size}
@@ -155,10 +149,7 @@ export function BudgetCategoryList({
           </p>
           <Button
             variant="ghost"
-            onClick={() => {
-              setSearch("")
-              setStatusFilter("all")
-            }}
+            onClick={() => setSearch("")}
             className="mt-2"
           >
             Clear filters

@@ -10,9 +10,6 @@ type BudgetToolbarProps = {
   // Sort
   sortValue: string
   onSortChange: (value: string) => void
-  // Filter by status
-  statusFilter: string
-  onStatusFilterChange: (value: string) => void
   // Selection
   selectionMode: boolean
   onSelectionModeChange: (enabled: boolean) => void
@@ -49,29 +46,19 @@ export function BudgetToolbar({
   className,
 }: BudgetToolbarProps) {
   // Parse sort value
-  const [sortBy, direction] = sortValue === "status"
-    ? ["status", "desc"]
-    : sortValue.split("-") as [string, string]
+  const [sortBy, direction] = sortValue.split("-") as [string, string]
   const isAsc = direction === "asc"
 
   const handleSortSelect = (value: string) => {
     if (value === sortBy) {
       // Tapping active chip toggles direction
-      if (value !== "status") {
-        onSortChange(`${value}-${isAsc ? "desc" : "asc"}`)
-      }
+      onSortChange(`${value}-${isAsc ? "desc" : "asc"}`)
     } else {
-      // Switching to a new sort
-      if (value === "status") {
-        onSortChange("status")
-      } else {
-        onSortChange(`${value}-${direction}`)
-      }
+      onSortChange(`${value}-${direction}`)
     }
   }
 
   const toggleDirection = () => {
-    if (sortBy === "status") return
     onSortChange(`${sortBy}-${isAsc ? "desc" : "asc"}`)
   }
 
@@ -118,8 +105,7 @@ export function BudgetToolbar({
           })}
 
           {/* Direction toggle */}
-          {sortBy !== "status" && (
-            <button
+          <button
               type="button"
               onClick={toggleDirection}
               className="inline-flex items-center justify-center rounded-full size-7 bg-surface-container-low text-muted-foreground hover:bg-surface-container hover:text-foreground transition-all duration-200"
@@ -127,7 +113,6 @@ export function BudgetToolbar({
             >
               <Icon name={isAsc ? "arrow_upward" : "arrow_downward"} size="xs" />
             </button>
-          )}
         </div>
 
         {/* Right-side actions */}
