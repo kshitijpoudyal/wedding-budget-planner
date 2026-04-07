@@ -1,13 +1,6 @@
 import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
 type BudgetToolbarProps = {
@@ -38,7 +31,6 @@ const SORT_OPTIONS = [
   { value: "budget", label: "Budget", icon: "payments" },
   { value: "alpha", label: "Name", icon: "sort_by_alpha" },
   { value: "date", label: "Date", icon: "schedule" },
-  { value: "status", label: "Status", icon: "label" },
 ] as const
 
 export function BudgetToolbar({
@@ -62,12 +54,19 @@ export function BudgetToolbar({
     : sortValue.split("-") as [string, string]
   const isAsc = direction === "asc"
 
-  const handleSortChange = (newSortBy: string | null) => {
-    if (!newSortBy) return
-    if (newSortBy === "status") {
-      onSortChange("status")
+  const handleSortSelect = (value: string) => {
+    if (value === sortBy) {
+      // Tapping active chip toggles direction
+      if (value !== "status") {
+        onSortChange(`${value}-${isAsc ? "desc" : "asc"}`)
+      }
     } else {
-      onSortChange(`${newSortBy}-${direction}`)
+      // Switching to a new sort
+      if (value === "status") {
+        onSortChange("status")
+      } else {
+        onSortChange(`${value}-${direction}`)
+      }
     }
   }
 
@@ -76,88 +75,68 @@ export function BudgetToolbar({
     onSortChange(`${sortBy}-${isAsc ? "desc" : "asc"}`)
   }
 
-  // Cycle through sort options on mobile
-  const cycleSortOption = () => {
-    const currentIndex = SORT_OPTIONS.findIndex((opt) => opt.value === sortBy)
-    const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length
-    const nextSort = SORT_OPTIONS[nextIndex].value
-    if (nextSort === "status") {
-      onSortChange("status")
-    } else {
-      onSortChange(`${nextSort}-${direction}`)
-    }
-  }
-
-  // Get current sort icon for mobile button
-  const currentSortIcon = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.icon ?? "sort"
-
   return (
-    <div className={cn("rounded-xl bg-surface-container-low glass-surface p-2 space-y-2", className)}>
-      {/* Main toolbar row */}
+    <div className={cn("rounded-2xl bg-card glass-card p-4 space-y-3", className)}>
+      {/* Row 1: Full-width search */}
+      <div className="relative">
+        <Icon
+          name="search"
+          size="md"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+        />
+        <Input
+          type="search"
+          placeholder="Search budget items..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-10 h-11 text-sm"
+        />
+      </div>
+
+      {/* Row 2: Sort chips + direction + actions */}
       <div className="flex items-center gap-2">
-        {/* Search */}
-        <div className="relative flex-1 min-w-0 sm:max-w-xs">
-          <Icon
-            name="search"
-            size="sm"
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-          />
-          <Input
-            type="search"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-8"
-          />
-        </div>
+        {/* Sort chips — scrollable on mobile */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          {SORT_OPTIONS.map((opt) => {
+            const isActive = sortBy === opt.value
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => handleSortSelect(opt.value)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all duration-200 select-none",
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-[0_2px_8px_rgba(18,117,226,0.25)] dark:shadow-[0_2px_8px_rgba(164,201,255,0.15)]"
+                    : "bg-surface-container-low text-muted-foreground hover:bg-surface-container hover:text-foreground"
+                )}
+              >
+                <Icon name={opt.icon} size="xs" />
+                <span className="hidden sm:inline">{opt.label}</span>
+              </button>
+            )
+          })}
 
-        {/* Sort — mobile: icon button that cycles options */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={cycleSortOption}
-          className="sm:hidden"
-          title={`Sort by ${SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label}`}
-        >
-          <Icon name={currentSortIcon} size="md" />
-        </Button>
-
-        {/* Sort — desktop: select + direction toggle */}
-        <div className="hidden sm:flex items-center">
-          <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-auto gap-1 rounded-r-none border-r-0">
-              <Icon name="sort" size="sm" className="text-muted-foreground" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  <span className="flex items-center gap-2">
-                    <Icon name={opt.icon} size="sm" className="text-muted-foreground" />
-                    {opt.label}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Direction toggle */}
           {sortBy !== "status" && (
-            <Button
-              variant="outline"
+            <button
+              type="button"
               onClick={toggleDirection}
-              className="px-2 rounded-l-none"
+              className="inline-flex items-center justify-center rounded-full size-7 bg-surface-container-low text-muted-foreground hover:bg-surface-container hover:text-foreground transition-all duration-200"
+              title={isAsc ? "Ascending" : "Descending"}
             >
-              <Icon name={isAsc ? "arrow_upward" : "arrow_downward"} size="sm" />
-            </Button>
+              <Icon name={isAsc ? "arrow_upward" : "arrow_downward"} size="xs" />
+            </button>
           )}
         </div>
 
         {/* Right-side actions */}
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-1.5 ml-auto shrink-0">
           {/* Selection toggle */}
           {hasItems && (
             <Button
               variant={selectionMode ? "secondary" : "ghost"}
-              size="icon"
+              size="sm"
               onClick={() => {
                 if (selectionMode) {
                   onClearSelection()
@@ -166,30 +145,25 @@ export function BudgetToolbar({
                   onSelectionModeChange(true)
                 }
               }}
-              className="sm:w-auto sm:px-2.5 sm:gap-1.5"
             >
-              <Icon name={selectionMode ? "close" : "checklist"} size="md" className="sm:[font-size:14px]" />
-              <span className="hidden sm:inline text-sm">
+              <Icon name={selectionMode ? "close" : "checklist"} size="sm" />
+              <span className="hidden sm:inline">
                 {selectionMode ? "Cancel" : "Select"}
               </span>
             </Button>
           )}
 
           {/* Add button */}
-          <Button
-            onClick={onAdd}
-            size="icon"
-            className="sm:w-auto sm:px-2.5 sm:gap-1.5"
-          >
-            <Icon name="add" size="md" className="sm:[font-size:14px]" />
-            <span className="hidden sm:inline text-sm">Add</span>
+          <Button onClick={onAdd} size="sm">
+            <Icon name="add" size="sm" />
+            <span className="hidden sm:inline">Add</span>
           </Button>
         </div>
       </div>
 
       {/* Selection row */}
       {selectionMode && hasItems && (
-        <div className="flex items-center gap-2 text-sm px-0.5">
+        <div className="flex items-center gap-2 text-sm pt-1 border-t border-border/30">
           <span className="text-muted-foreground">
             {selectedCount} of {totalCount} selected
           </span>

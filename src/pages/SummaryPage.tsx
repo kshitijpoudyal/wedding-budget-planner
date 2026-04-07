@@ -25,8 +25,10 @@ function collectLeafNodes(nodes: BudgetTreeNode[]): BudgetTreeNode[] {
 }
 
 export default function SummaryPage() {
-  const { tree, grandTotalBudget, grandTotalSpent, remaining, progress, isLoading } =
+  const { tree, grandTotalSpent, finalizedBudget, isLoading } =
     useBudgetTree()
+  const finalizedRemaining = finalizedBudget - grandTotalSpent
+  const finalizedProgress = finalizedBudget > 0 ? (grandTotalSpent / finalizedBudget) * 100 : 0
   const { data: settings } = useSettings()
   const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
@@ -52,24 +54,24 @@ export default function SummaryPage() {
     <div className="p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
       <SectionHeading title="The Overview" subtitle="Your celebration at a glance" />
 
-      {/* Top-level stats */}
+      {/* Top-level stats — finalized only */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <StatCard
-          label="Total Budget"
-          value={formatCurrency(grandTotalBudget, currency, rate)}
-          icon="payments"
+          label="Finalized Budget"
+          value={formatCurrency(finalizedBudget, currency, rate)}
+          icon="check_circle"
         />
         <StatCard
           label="Total Spent"
           value={formatCurrency(grandTotalSpent, currency, rate)}
           icon="trending_up"
-          variant={progress > 100 ? "danger" : "default"}
+          variant={finalizedProgress > 100 ? "danger" : "default"}
         />
         <StatCard
           label="Remaining"
-          value={formatCurrency(remaining, currency, rate)}
+          value={formatCurrency(finalizedRemaining, currency, rate)}
           icon="savings"
-          variant={remaining < 0 ? "danger" : "default"}
+          variant={finalizedRemaining < 0 ? "danger" : "default"}
         />
       </div>
 
@@ -77,9 +79,9 @@ export default function SummaryPage() {
       <div className="rounded-xl bg-card glass-card p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-medium">Overall Progress</p>
-          <p className="text-sm font-bold tabular-nums">{Math.round(progress)}%</p>
+          <p className="text-sm font-bold tabular-nums">{Math.round(finalizedProgress)}%</p>
         </div>
-        <ProgressBar value={grandTotalSpent} max={grandTotalBudget} />
+        <ProgressBar value={grandTotalSpent} max={finalizedBudget} />
       </div>
 
       {/* Category breakdown */}

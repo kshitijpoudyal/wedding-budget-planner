@@ -47,10 +47,33 @@ export function useBudgetTree() {
     [tree],
   )
 
+  // Status-based budget totals (finalized vs draft)
+  const { finalizedBudget, draftBudget } = useMemo(() => {
+    let finalized = 0
+    let draft = 0
+    function sumByStatus(nodes: BudgetTreeNode[]) {
+      for (const node of nodes) {
+        if (node.isLeaf) {
+          if (node.item.status === "finalized") {
+            finalized += node.item.budgetAmount
+          } else {
+            draft += node.item.budgetAmount
+          }
+        } else {
+          sumByStatus(node.children)
+        }
+      }
+    }
+    sumByStatus(tree)
+    return { finalizedBudget: finalized, draftBudget: draft }
+  }, [tree])
+
   return {
     tree,
     grandTotalBudget,
     grandTotalSpent,
+    finalizedBudget,
+    draftBudget,
     remaining: grandTotalBudget - grandTotalSpent,
     progress: grandTotalBudget > 0 ? (grandTotalSpent / grandTotalBudget) * 100 : 0,
     ...rest,

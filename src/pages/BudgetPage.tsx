@@ -16,7 +16,7 @@ import {
 import type { BudgetItem, BudgetItemInput } from "@/types"
 
 export default function BudgetPage() {
-  const { tree, grandTotalBudget, grandTotalSpent, progress, isLoading, isError, error } =
+  const { tree, grandTotalBudget, grandTotalSpent, finalizedBudget, draftBudget, progress, isLoading, isError, error } =
     useBudgetTree()
 
   const createMutation = useCreateBudgetItem()
@@ -89,6 +89,8 @@ export default function BudgetPage() {
       <BudgetFinancialOverview
         totalBudget={grandTotalBudget}
         totalSpent={grandTotalSpent}
+        finalizedBudget={finalizedBudget}
+        draftBudget={draftBudget}
         progress={progress}
       />
 
