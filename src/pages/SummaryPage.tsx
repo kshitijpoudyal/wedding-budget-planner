@@ -164,8 +164,10 @@ export default function SummaryPage() {
                   </div>
                   <div
                     className={cn(
-                      "flex items-center gap-1 text-sm font-medium shrink-0",
-                      item.variance > 0 ? "text-error" : "text-success"
+                      "flex items-center gap-1.5 text-sm font-medium shrink-0 rounded-full px-2.5 py-1",
+                      item.variance > 0
+                        ? "bg-red-500/10 text-red-600 dark:bg-red-500/15 dark:text-red-400"
+                        : "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400"
                     )}
                   >
                     <Icon
