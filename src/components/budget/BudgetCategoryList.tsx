@@ -3,7 +3,7 @@ import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { SectionHeading } from "@/components/ui/section-heading"
 import { BudgetCategoryCard } from "./BudgetCategoryCard"
-import { BudgetToolbar } from "./BudgetToolbar"
+import { BudgetToolbar, type SearchFilter } from "./BudgetToolbar"
 import { BulkActionBar } from "./BulkActionBar"
 import { sortNodes } from "./sortNodes"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
@@ -32,16 +32,26 @@ function collectAllIds(nodes: BudgetTreeNode[]): string[] {
 }
 
 // Helper to filter tree nodes by search query (matches name, notes, vendorName)
-function filterTree(nodes: BudgetTreeNode[], query: string): BudgetTreeNode[] {
+function filterTree(nodes: BudgetTreeNode[], query: string, filterBy: SearchFilter): BudgetTreeNode[] {
   const lowerQuery = query.toLowerCase().trim()
 
   function matchesQuery(node: BudgetTreeNode): boolean {
     const { item } = node
     if (!lowerQuery) return true
-    if (item.name.toLowerCase().includes(lowerQuery)) return true
-    if (item.notes?.toLowerCase().includes(lowerQuery)) return true
-    if (item.vendorName?.toLowerCase().includes(lowerQuery)) return true
-    return false
+    switch (filterBy) {
+      case "name":
+        return item.name.toLowerCase().includes(lowerQuery)
+      case "vendor":
+        return item.vendorName?.toLowerCase().includes(lowerQuery) ?? false
+      case "notes":
+        return item.notes?.toLowerCase().includes(lowerQuery) ?? false
+      default:
+        return (
+          item.name.toLowerCase().includes(lowerQuery) ||
+          (item.notes?.toLowerCase().includes(lowerQuery) ?? false) ||
+          (item.vendorName?.toLowerCase().includes(lowerQuery) ?? false)
+        )
+    }
   }
 
   function filterNode(node: BudgetTreeNode): BudgetTreeNode | null {
@@ -76,12 +86,13 @@ export function BudgetCategoryList({
 }: BudgetCategoryListProps) {
   const [sort, setSort] = useState("budget-desc")
   const [search, setSearch] = useState("")
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>("all")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [selectionMode, setSelectionMode] = useState(false)
 
   const filteredTree = useMemo(
-    () => filterTree(tree, search),
-    [tree, search]
+    () => filterTree(tree, search, searchFilter),
+    [tree, search, searchFilter]
   )
   const sortedTree = useMemo(() => sortNodes(filteredTree, sort), [filteredTree, sort])
   const allIds = useMemo(() => collectAllIds(filteredTree), [filteredTree])
@@ -119,6 +130,8 @@ export function BudgetCategoryList({
       <BudgetToolbar
         search={search}
         onSearchChange={setSearch}
+        searchFilter={searchFilter}
+        onSearchFilterChange={setSearchFilter}
         sortValue={sort}
         onSortChange={setSort}
         selectionMode={selectionMode}
