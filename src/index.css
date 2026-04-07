@@ -76,10 +76,10 @@
     --input: #C4C6CF;
     --ring: #1275e2;
     --chart-1: #1275e2;
-    --chart-2: #5f78a3;
+    --chart-2: #059669;
     --chart-3: #c55b00;
-    --chart-4: #7BAFFF;
-    --chart-5: #A3B4D0;
+    --chart-4: #7C3AED;
+    --chart-5: #E11D48;
     --radius: 0.5rem;
     --surface-container-low: rgba(233, 235, 240, 0.60);
     --surface-container: rgba(225, 228, 233, 0.65);
@@ -117,10 +117,10 @@
     --input: rgba(255, 255, 255, 0.12);
     --ring: #A4C9FF;
     --chart-1: #A4C9FF;
-    --chart-2: #B8C8E8;
+    --chart-2: #6EE7B7;
     --chart-3: #FFB77C;
-    --chart-4: #7BAFFF;
-    --chart-5: #A3B4D0;
+    --chart-4: #C4B5FD;
+    --chart-5: #FDA4AF;
     --surface-container-low: rgba(30, 32, 38, 0.60);
     --surface-container: rgba(36, 38, 44, 0.65);
     --surface-container-high: rgba(48, 50, 56, 0.75);

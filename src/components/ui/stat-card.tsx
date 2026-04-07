@@ -7,36 +7,43 @@ type StatCardProps = {
   icon?: IconName
   className?: string
   variant?: "default" | "danger"
+  iconClassName?: string
+  accentColor?: string
 }
 
-export function StatCard({ label, value, icon, className, variant = "default" }: StatCardProps) {
+export function StatCard({ label, value, icon, className, variant = "default", iconClassName, accentColor }: StatCardProps) {
   return (
     <div
       className={cn(
-        "rounded-xl bg-card glass-card p-4",
+        "rounded-xl bg-card glass-card overflow-hidden",
         className,
       )}
     >
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
-        {icon && (
-          <Icon
-            name={icon}
-            size="md"
-            className={cn(
-              variant === "danger" ? "text-destructive" : "text-muted-foreground",
-            )}
-          />
-        )}
+      {accentColor && (
+        <div className={cn("h-1", accentColor)} />
+      )}
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
+          {icon && (
+            <Icon
+              name={icon}
+              size="md"
+              className={cn(
+                variant === "danger" ? "text-destructive" : iconClassName ?? "text-muted-foreground",
+              )}
+            />
+          )}
+        </div>
+        <p
+          className={cn(
+            "mt-1 text-2xl font-bold tracking-tight",
+            variant === "danger" ? "text-destructive" : "text-card-foreground",
+          )}
+        >
+          {value}
+        </p>
       </div>
-      <p
-        className={cn(
-          "mt-1 text-2xl font-bold tracking-tight",
-          variant === "danger" ? "text-destructive" : "text-card-foreground",
-        )}
-      >
-        {value}
-      </p>
     </div>
   )
 }

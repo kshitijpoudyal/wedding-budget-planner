@@ -60,18 +60,24 @@ export default function SummaryPage() {
           label="Finalized Budget"
           value={formatCurrency(finalizedBudget, currency, rate)}
           icon="check_circle"
+          iconClassName="text-primary"
+          accentColor="bg-primary"
         />
         <StatCard
           label="Total Spent"
           value={formatCurrency(grandTotalSpent, currency, rate)}
           icon="trending_up"
           variant={finalizedProgress > 100 ? "danger" : "default"}
+          iconClassName="text-tertiary"
+          accentColor="bg-tertiary"
         />
         <StatCard
           label="Remaining"
           value={formatCurrency(finalizedRemaining, currency, rate)}
           icon="savings"
           variant={finalizedRemaining < 0 ? "danger" : "default"}
+          iconClassName="text-emerald-600 dark:text-emerald-400"
+          accentColor="bg-emerald-500"
         />
       </div>
 
@@ -101,16 +107,22 @@ export default function SummaryPage() {
               label="Draft"
               value={String(statusCounts.draft || 0)}
               icon="edit_note"
+              iconClassName="text-muted-foreground"
+              accentColor="bg-muted-foreground"
             />
             <StatCard
               label="Finalized"
               value={String(statusCounts.finalized || 0)}
               icon="check_circle"
+              iconClassName="text-primary"
+              accentColor="bg-primary"
             />
             <StatCard
               label="Complete"
               value={String(statusCounts.complete || 0)}
               icon="task_alt"
+              iconClassName="text-emerald-600 dark:text-emerald-400"
+              accentColor="bg-emerald-500"
             />
           </div>
         </section>

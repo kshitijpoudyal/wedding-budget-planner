@@ -1,5 +1,7 @@
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { formatCurrency } from "@/lib/currency"
+import { getCategoryColor } from "@/lib/categoryColors"
+import { cn } from "@/lib/utils"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 import type { Settings } from "@/types"
 
@@ -19,13 +21,18 @@ export function CategoryBreakdown({ tree, currency, exchangeRate }: CategoryBrea
           ? (node.totalSpent / node.totalBudget) * 100
           : 0
 
+        const color = getCategoryColor(node.item.name)
+
         return (
           <div
             key={node.item.id}
-            className="rounded-xl bg-card glass-card p-4"
+            className={cn("rounded-xl bg-card glass-card p-4 border-l-[3px]", color.border)}
           >
             <div className="flex items-center justify-between mb-1">
-              <h4 className="text-sm font-bold truncate">{node.item.name}</h4>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className={cn("h-2 w-2 rounded-full shrink-0", color.dot)} />
+                <h4 className="text-sm font-bold truncate">{node.item.name}</h4>
+              </div>
               <span className="text-xs text-muted-foreground tabular-nums">
                 {Math.round(percent)}%
               </span>

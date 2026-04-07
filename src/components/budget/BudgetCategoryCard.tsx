@@ -7,6 +7,7 @@ import { BudgetSubItemCard } from "./BudgetSubItemCard"
 import { CategoryActionMenu } from "./CategoryActionMenu"
 import { sortNodes } from "./sortNodes"
 import { formatCurrency } from "@/lib/currency"
+import { getCategoryColor } from "@/lib/categoryColors"
 import { useSettings } from "@/hooks/useSettings"
 import { cn } from "@/lib/utils"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
@@ -42,6 +43,7 @@ export function BudgetCategoryCard({
 
   const { item, children, totalBudget, totalSpent } = node
   const hasChildren = children.length > 0
+  const categoryColor = getCategoryColor(item.name)
   const sortedChildren = useMemo(() => sortNodes(children, sort), [children, sort])
   const isSelected = selectedIds.has(item.id)
 
@@ -55,7 +57,8 @@ export function BudgetCategoryCard({
 
   return (
     <div className={cn(
-      "rounded-xl bg-card glass-card overflow-hidden transition-all duration-200 border-l-[3px] border-l-primary/40",
+      "rounded-xl bg-card glass-card overflow-hidden transition-all duration-200 border-l-[3px]",
+      categoryColor.border,
       selectionMode && isSelected && "ring-2 ring-primary"
     )}>
       <button

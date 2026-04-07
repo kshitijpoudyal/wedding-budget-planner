@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils"
 import { auth } from "@/lib/firebase"
 import { queryClient } from "@/lib/queryClient"
 
-const navItems: { to: string; label: string; icon: IconName }[] = [
-  { to: "/budget", label: "Budget", icon: "payments" },
-  { to: "/summary", label: "Summary", icon: "auto_graph" },
-  { to: "/calculator", label: "Calculator", icon: "calculate" },
-  { to: "/settings", label: "Settings", icon: "settings" },
+const navItems: { to: string; label: string; icon: IconName; color: string }[] = [
+  { to: "/budget", label: "Budget", icon: "payments", color: "text-blue-600 dark:text-blue-400" },
+  { to: "/summary", label: "Summary", icon: "auto_graph", color: "text-emerald-600 dark:text-emerald-400" },
+  { to: "/calculator", label: "Calculator", icon: "calculate", color: "text-violet-600 dark:text-violet-400" },
+  { to: "/settings", label: "Settings", icon: "settings", color: "text-muted-foreground" },
 ]
 
 type SidebarProps = {
@@ -58,7 +58,7 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
       </div>
 
       <nav className="flex-1 flex flex-col gap-1 px-2 py-2">
-        {navItems.map(({ to, label, icon }) => {
+        {navItems.map(({ to, label, icon, color }) => {
           const link = (
             <NavLink
               key={to}
@@ -74,7 +74,7 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
                 )
               }
             >
-              <Icon name={icon} size="lg" />
+              <Icon name={icon} size="lg" className={color} />
               {!collapsed && <span className="truncate">{label}</span>}
             </NavLink>
           )

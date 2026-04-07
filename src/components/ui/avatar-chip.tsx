@@ -1,5 +1,6 @@
 import { Icon } from "@/components/ui/icon"
 import { cn } from "@/lib/utils"
+import { getCategoryColor } from "@/lib/categoryColors"
 
 type AvatarChipProps = {
   name: string
@@ -17,14 +18,16 @@ function getInitials(name: string): string {
 }
 
 export function AvatarChip({ name, onRemove, className }: AvatarChipProps) {
+  const color = getCategoryColor(name)
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full bg-tertiary-container px-2 py-0.5 text-xs font-medium text-foreground dark:text-foreground",
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-foreground dark:text-foreground",
+        color.chipBg,
         className,
       )}
     >
-      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-tertiary text-[8px] font-bold text-white dark:text-primary-foreground">
+      <span className={cn("flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-bold text-white", color.chipCircle)}>
         {getInitials(name)}
       </span>
       <span className="truncate max-w-[80px]">{name}</span>
