@@ -60,6 +60,10 @@ export function BulkActionBar({
             <Icon name="check_circle" size="sm" className="text-primary" />
             Finalized
           </SelectItem>
+          <SelectItem value="complete">
+            <Icon name="task_alt" size="sm" className="text-emerald-600 dark:text-emerald-400" />
+            Complete
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

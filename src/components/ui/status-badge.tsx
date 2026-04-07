@@ -4,6 +4,7 @@ import type { BudgetItem } from "@/types"
 const variants: Record<BudgetItem["status"], string> = {
   draft: "bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground",
   finalized: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
+  complete: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
 }
 
 type StatusBadgeProps = {

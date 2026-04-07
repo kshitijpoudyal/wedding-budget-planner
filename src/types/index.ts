@@ -6,7 +6,7 @@ export type BudgetItem = {
   budgetAmount: number
   spentAmount: number
   parentId: string | null
-  status: "draft" | "finalized"
+  status: "draft" | "finalized" | "complete"
   // Extended fields
   notes: string | null
   vendorName: string | null

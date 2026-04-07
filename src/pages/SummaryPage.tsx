@@ -96,7 +96,7 @@ export default function SummaryPage() {
       {tree.length > 0 && (
         <section className="space-y-4">
           <SectionHeading title="By Status" />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <StatCard
               label="Draft"
               value={String(statusCounts.draft || 0)}
@@ -106,6 +106,11 @@ export default function SummaryPage() {
               label="Finalized"
               value={String(statusCounts.finalized || 0)}
               icon="check_circle"
+            />
+            <StatCard
+              label="Complete"
+              value={String(statusCounts.complete || 0)}
+              icon="task_alt"
             />
           </div>
         </section>
