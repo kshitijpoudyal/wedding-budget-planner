@@ -127,10 +127,11 @@ export default function SummaryPage() {
       {/* Estimate vs Actual - Items with significant variance */}
       {tree.length > 0 && (() => {
         const leaves = collectLeafNodes(tree)
-        // Filter items with >10% variance where both budget and spent are > 0
+        // Filter completed items with >10% variance where both budget and spent are > 0
         const varianceItems = leaves
           .filter((node) => {
-            const { budgetAmount, spentAmount } = node.item
+            const { budgetAmount, spentAmount, status } = node.item
+            if (status !== "complete") return false
             if (budgetAmount <= 0 || spentAmount <= 0) return false
             const variance = Math.abs((spentAmount - budgetAmount) / budgetAmount)
             return variance > 0.1 // More than 10% difference
@@ -147,7 +148,7 @@ export default function SummaryPage() {
 
         return (
           <section className="space-y-4">
-            <SectionHeading title="Estimate vs Actual" subtitle="Items with significant variance" />
+            <SectionHeading title="Estimate vs Actual" subtitle="Completed items with significant variance" />
             <div className="space-y-2">
               {varianceItems.map((item) => (
                 <div
