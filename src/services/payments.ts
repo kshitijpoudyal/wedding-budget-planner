@@ -45,3 +45,12 @@ export async function createPayment(
 export async function deletePayment(userId: string, id: string): Promise<void> {
   await deleteDoc(doc(db, userCollection(userId, "payments"), id))
 }
+
+export async function deletePaymentsByItem(userId: string, budgetItemId: string): Promise<void> {
+  const q = query(
+    collection(db, userCollection(userId, "payments")),
+    where("budgetItemId", "==", budgetItemId),
+  )
+  const snapshot = await getDocs(q)
+  await Promise.all(snapshot.docs.map((d) => deleteDoc(d.ref)))
+}

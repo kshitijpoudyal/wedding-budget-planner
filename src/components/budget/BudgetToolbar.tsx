@@ -3,8 +3,9 @@ import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import type { SearchFilter } from "@/types"
 
-export type SearchFilter = "all" | "name" | "vendor" | "notes"
+export type { SearchFilter }
 
 type BudgetToolbarProps = {
   // Search

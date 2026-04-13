@@ -25,7 +25,7 @@ function collectLeafNodes(nodes: BudgetTreeNode[]): BudgetTreeNode[] {
 }
 
 export default function SummaryPage() {
-  const { tree, grandTotalSpent, finalizedBudget, isLoading } =
+  const { tree, grandTotalSpent, finalizedBudget, isLoading, isError, error } =
     useBudgetTree()
   const finalizedRemaining = finalizedBudget - grandTotalSpent
   const finalizedProgress = finalizedBudget > 0 ? (grandTotalSpent / finalizedBudget) * 100 : 0
@@ -50,8 +50,19 @@ export default function SummaryPage() {
     )
   }
 
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-2">
+        <p className="text-destructive font-medium">Failed to load summary</p>
+        <p className="text-muted-foreground text-sm">
+          {(error as Error)?.message || "Please check your connection and try again."}
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
+    <div className="p-5 md:p-8 space-y-10 max-w-4xl mx-auto">
       <SectionHeading title="The Overview" subtitle="Your celebration at a glance" />
 
       {/* Top-level stats — finalized only */}
@@ -61,7 +72,7 @@ export default function SummaryPage() {
           value={formatCurrency(finalizedBudget, currency, rate)}
           icon="check_circle"
           iconClassName="text-primary"
-          accentColor="bg-primary"
+          iconBg="bg-primary/10"
         />
         <StatCard
           label="Total Spent"
@@ -69,7 +80,7 @@ export default function SummaryPage() {
           icon="trending_up"
           variant={finalizedProgress > 100 ? "danger" : "default"}
           iconClassName="text-tertiary"
-          accentColor="bg-tertiary"
+          iconBg={finalizedProgress > 100 ? "bg-destructive/10" : "bg-tertiary/10"}
         />
         <StatCard
           label="Remaining"
@@ -77,15 +88,15 @@ export default function SummaryPage() {
           icon="savings"
           variant={finalizedRemaining < 0 ? "danger" : "default"}
           iconClassName="text-emerald-600 dark:text-emerald-400"
-          accentColor="bg-emerald-500"
+          iconBg="bg-emerald-500/10"
         />
       </div>
 
       {/* Overall progress */}
-      <div className="rounded-xl bg-card glass-card p-4">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium">Overall Progress</p>
-          <p className="text-sm font-bold tabular-nums">{Math.round(finalizedProgress)}%</p>
+      <div className="rounded-2xl bg-card glass-card p-5">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-semibold">Overall Progress</p>
+          <p className="text-sm font-bold tabular-nums text-muted-foreground">{Math.round(finalizedProgress)}%</p>
         </div>
         <ProgressBar value={grandTotalSpent} max={finalizedBudget} />
       </div>
@@ -108,21 +119,21 @@ export default function SummaryPage() {
               value={String(statusCounts.draft || 0)}
               icon="edit_note"
               iconClassName="text-muted-foreground"
-              accentColor="bg-muted-foreground"
+              iconBg="bg-muted"
             />
             <StatCard
               label="Finalized"
               value={String(statusCounts.finalized || 0)}
               icon="check_circle"
               iconClassName="text-primary"
-              accentColor="bg-primary"
+              iconBg="bg-primary/10"
             />
             <StatCard
               label="Complete"
               value={String(statusCounts.complete || 0)}
               icon="task_alt"
               iconClassName="text-emerald-600 dark:text-emerald-400"
-              accentColor="bg-emerald-500"
+              iconBg="bg-emerald-500/10"
             />
           </div>
         </section>

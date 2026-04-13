@@ -1,10 +1,17 @@
 import { getAllBudgetItems, deleteBudgetItem } from "./budgetItems"
+import { deletePaymentsByItem } from "./payments"
+import type { BudgetItem } from "@/types"
 
 /**
- * Delete a budget item and all its descendants.
+ * Delete a budget item and all its descendants, including their payments.
+ * Pass `allItems` from the React Query cache to avoid an extra Firestore fetch.
  */
-export async function cascadeDeleteBudgetItem(userId: string, itemId: string): Promise<void> {
-  const allItems = await getAllBudgetItems(userId)
+export async function cascadeDeleteBudgetItem(
+  userId: string,
+  itemId: string,
+  cachedItems?: BudgetItem[],
+): Promise<void> {
+  const allItems = cachedItems ?? await getAllBudgetItems(userId)
 
   const idsToDelete = new Set<string>()
 
@@ -21,6 +28,9 @@ export async function cascadeDeleteBudgetItem(userId: string, itemId: string): P
   collectDescendants(itemId)
 
   await Promise.all(
-    Array.from(idsToDelete).map((id) => deleteBudgetItem(userId, id)),
+    Array.from(idsToDelete).flatMap((id) => [
+      deleteBudgetItem(userId, id),
+      deletePaymentsByItem(userId, id),
+    ]),
   )
 }

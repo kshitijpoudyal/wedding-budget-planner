@@ -15,7 +15,7 @@ export function CategoryBreakdown({ tree, currency, exchangeRate }: CategoryBrea
   if (tree.length === 0) return null
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {tree.map((node) => {
         const percent = node.totalBudget > 0
           ? (node.totalSpent / node.totalBudget) * 100
@@ -26,19 +26,19 @@ export function CategoryBreakdown({ tree, currency, exchangeRate }: CategoryBrea
         return (
           <div
             key={node.item.id}
-            className={cn("rounded-xl bg-card glass-card p-4 border-l-[3px]", color.border)}
+            className={cn("rounded-2xl p-4 glass-card", color.bg)}
           >
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 min-w-0">
-                <span className={cn("h-2 w-2 rounded-full shrink-0", color.dot)} />
+                <span className={cn("h-2.5 w-2.5 rounded-full shrink-0", color.dot)} />
                 <h4 className="text-sm font-bold truncate">{node.item.name}</h4>
               </div>
-              <span className="text-xs text-muted-foreground tabular-nums">
+              <span className={cn("text-xs font-semibold tabular-nums", color.text)}>
                 {Math.round(percent)}%
               </span>
             </div>
             <ProgressBar value={node.totalSpent} max={node.totalBudget} />
-            <div className="flex justify-between mt-2 text-xs text-muted-foreground tabular-nums">
+            <div className="flex justify-between mt-2.5 text-xs text-muted-foreground tabular-nums">
               <span>Spent: {formatCurrency(node.totalSpent, currency, exchangeRate)}</span>
               <span>Budget: {formatCurrency(node.totalBudget, currency, exchangeRate)}</span>
             </div>

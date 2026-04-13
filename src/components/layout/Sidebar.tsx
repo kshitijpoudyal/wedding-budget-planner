@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils"
 import { auth } from "@/lib/firebase"
 import { queryClient } from "@/lib/queryClient"
 
-const navItems: { to: string; label: string; icon: IconName; color: string }[] = [
-  { to: "/budget", label: "Budget", icon: "payments", color: "text-blue-600 dark:text-blue-400" },
-  { to: "/summary", label: "Summary", icon: "auto_graph", color: "text-emerald-600 dark:text-emerald-400" },
-  { to: "/calculator", label: "Calculator", icon: "calculate", color: "text-violet-600 dark:text-violet-400" },
-  { to: "/settings", label: "Settings", icon: "settings", color: "text-muted-foreground" },
+const navItems: { to: string; label: string; icon: IconName; color: string; activeBg: string }[] = [
+  { to: "/budget", label: "Budget", icon: "payments", color: "text-blue-600 dark:text-blue-400", activeBg: "bg-blue-500/10" },
+  { to: "/summary", label: "Summary", icon: "auto_graph", color: "text-emerald-600 dark:text-emerald-400", activeBg: "bg-emerald-500/10" },
+  { to: "/calculator", label: "Calculator", icon: "calculate", color: "text-violet-600 dark:text-violet-400", activeBg: "bg-violet-500/10" },
+  { to: "/settings", label: "Settings", icon: "settings", color: "text-muted-foreground", activeBg: "bg-muted" },
 ]
 
 type SidebarProps = {
@@ -37,15 +37,21 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-col h-screen bg-sidebar text-sidebar-foreground transition-all duration-200 backdrop-blur-xl border-r border-white/10 dark:border-white/[0.04]",
+        "hidden md:flex flex-col h-screen bg-sidebar text-sidebar-foreground transition-all duration-200 backdrop-blur-xl border-r border-border/40",
         collapsed ? "w-[68px]" : "w-[260px]",
       )}
     >
-      <div className={cn("flex items-center h-14 px-4", collapsed ? "justify-center" : "gap-2")}>
+      {/* Header */}
+      <div className={cn("flex items-center h-16 px-4", collapsed ? "justify-center" : "gap-2.5")}>
         {!collapsed && (
-          <span className="text-lg font-bold tracking-tight truncate">
-            Wedding Planner
-          </span>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="shrink-0 w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Icon name="favorite" size="sm" className="text-primary" />
+            </div>
+            <span className="text-base font-extrabold tracking-tight truncate text-foreground">
+              Wedding Planner
+            </span>
+          </div>
         )}
         <Button
           variant="ghost"
@@ -57,25 +63,29 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
         </Button>
       </div>
 
-      <nav className="flex-1 flex flex-col gap-1 px-2 py-2">
-        {navItems.map(({ to, label, icon, color }) => {
+      {/* Nav */}
+      <nav className="flex-1 flex flex-col gap-0.5 px-2 py-2">
+        {navItems.map(({ to, label, icon, color, activeBg }) => {
           const link = (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200",
-                  "hover:bg-surface-container hover:text-sidebar-accent-foreground",
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-surface-container text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70",
+                    ? cn("text-sidebar-accent-foreground font-semibold", activeBg)
+                    : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-muted/50",
                   collapsed && "justify-center px-0",
                 )
               }
             >
-              <Icon name={icon} size="lg" className={color} />
-              {!collapsed && <span className="truncate">{label}</span>}
+              {({ isActive }) => (
+                <>
+                  <Icon name={icon} size="lg" className={isActive ? color : "text-muted-foreground"} />
+                  {!collapsed && <span className="truncate">{label}</span>}
+                </>
+              )}
             </NavLink>
           )
 
@@ -91,7 +101,8 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
         })}
       </nav>
 
-      <div className="px-2 py-3 space-y-1">
+      {/* Footer */}
+      <div className="px-2 py-3 border-t border-border/30 space-y-0.5">
         {collapsed ? (
           <>
             <Tooltip>
@@ -115,11 +126,11 @@ export function Sidebar({ collapsed, onToggle, theme, onToggleTheme }: SidebarPr
           </>
         ) : (
           <>
-            <Button variant="ghost" onClick={onToggleTheme} className="w-full justify-start gap-3">
+            <Button variant="ghost" onClick={onToggleTheme} className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground">
               <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="md" />
               <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
             </Button>
-            <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start gap-3">
+            <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground">
               <Icon name="logout" size="md" />
               <span>Sign Out</span>
             </Button>

@@ -77,9 +77,10 @@ export function useDeletePayment() {
   const userId = useUserId()
 
   return useMutation({
-    mutationFn: (id: string) => deletePayment(userId, id),
-    onSuccess: () => {
+    mutationFn: ({ id }: { id: string; budgetItemId: string }) => deletePayment(userId, id),
+    onSuccess: (_, { budgetItemId }) => {
       queryClient.invalidateQueries({ queryKey: ["payments", userId] })
+      queryClient.invalidateQueries({ queryKey: ["payments", userId, budgetItemId] })
     },
   })
 }
