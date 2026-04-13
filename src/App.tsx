@@ -12,6 +12,7 @@ import LoginPage from "@/pages/LoginPage"
 const SummaryPage = lazy(() => import("@/pages/SummaryPage"))
 const SettingsPage = lazy(() => import("@/pages/SettingsPage"))
 const CalculatorPage = lazy(() => import("@/pages/CalculatorPage"))
+const SharedBudgetPage = lazy(() => import("@/pages/SharedBudgetPage"))
 
 function PageFallback() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/shared/:token" element={<Suspense fallback={<PageFallback />}><SharedBudgetPage /></Suspense>} />
               <Route element={<ProtectedRoute />}>
                 <Route element={<AppLayout />}>
                   <Route path="/" element={<Navigate to="/budget" replace />} />

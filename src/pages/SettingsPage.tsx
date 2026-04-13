@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { deleteSharedBudget } from "@/services/sharing"
 import {
   Select,
   SelectContent,
@@ -16,28 +17,73 @@ import { SectionHeading } from "@/components/ui/section-heading"
 import { useSettings } from "@/hooks/useSettings"
 import { useUpdateSettings } from "@/hooks/useSettingsMutations"
 import { useTheme } from "@/hooks/useTheme"
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth, useUserId } from "@/contexts/AuthContext"
 import { auth } from "@/lib/firebase"
 import { queryClient } from "@/lib/queryClient"
+import { useBudgetItems } from "@/hooks/useBudgetItems"
+import { bulkUpdateBudgetItems } from "@/services/budgetItems"
+import { cn } from "@/lib/utils"
 import type { Settings } from "@/types"
 
 export default function SettingsPage() {
-  const { data: settings, isLoading } = useSettings()
+  const { data: settings, isLoading, isError, error } = useSettings()
   const updateSettings = useUpdateSettings()
   const { theme, toggleTheme } = useTheme()
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  const { data: items } = useBudgetItems()
+  const userId = useUserId()
+
   const [currency, setCurrency] = useState<Settings["currency"]>("USD")
   const [exchangeRate, setExchangeRate] = useState("")
+  const [lockRate, setLockRate] = useState(false)
+  const [lockRateLoading, setLockRateLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [shareToken, setShareToken] = useState<string | null>(null)
+  const [shareLoading, setShareLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (settings) {
       setCurrency(settings.currency)
       setExchangeRate(String(settings.exchangeRate))
+      setLockRate(settings.lockRate ?? false)
+      setShareToken(settings.shareToken ?? null)
     }
   }, [settings])
+
+  const shareUrl = shareToken ? `${window.location.origin}/shared/${shareToken}` : null
+
+  const handleEnableSharing = async () => {
+    setShareLoading(true)
+    try {
+      const token = crypto.randomUUID()
+      await updateSettings.mutateAsync({ shareToken: token })
+      setShareToken(token)
+    } finally {
+      setShareLoading(false)
+    }
+  }
+
+  const handleDisableSharing = async () => {
+    if (!shareToken) return
+    setShareLoading(true)
+    try {
+      await deleteSharedBudget(shareToken)
+      await updateSettings.mutateAsync({ shareToken: null })
+      setShareToken(null)
+    } finally {
+      setShareLoading(false)
+    }
+  }
+
+  const handleCopyLink = async () => {
+    if (!shareUrl) return
+    await navigator.clipboard.writeText(shareUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleSave = () => {
     const rate = Number(exchangeRate)
@@ -53,6 +99,37 @@ export default function SettingsPage() {
     )
   }
 
+  const handleToggleLockRate = async () => {
+    const rate = Number(exchangeRate)
+    if (rate <= 0 || lockRateLoading) return
+
+    const newLockRate = !lockRate
+    setLockRate(newLockRate)
+    setLockRateLoading(true)
+
+    try {
+      await updateSettings.mutateAsync({ lockRate: newLockRate })
+
+      const allItems = items ?? []
+      const toUpdate = newLockRate
+        ? allItems.filter((item) => item.spentAmount > 0)
+        : allItems
+      const ids = toUpdate.map((item) => item.id)
+
+      if (ids.length > 0) {
+        await bulkUpdateBudgetItems(userId, ids, {
+          currencyRate: newLockRate ? rate : null,
+        })
+      }
+    } catch (e) {
+      // Revert optimistic toggle on failure
+      setLockRate(!newLockRate)
+      console.error(e)
+    } finally {
+      setLockRateLoading(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -61,13 +138,24 @@ export default function SettingsPage() {
     )
   }
 
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-2">
+        <p className="text-destructive font-medium">Failed to load settings</p>
+        <p className="text-muted-foreground text-sm">
+          {(error as Error)?.message || "Please check your connection and try again."}
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="p-4 md:p-6 space-y-8 max-w-2xl mx-auto">
+    <div className="p-5 md:p-8 space-y-8 max-w-2xl mx-auto">
       <SectionHeading title="Settings" subtitle="Configure your planner" />
 
       {/* Currency */}
-      <section className="rounded-xl bg-card glass-card p-4 md:p-5 space-y-4">
-        <h3 className="text-base font-bold">Currency</h3>
+      <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
+        <h3 className="text-base font-extrabold tracking-tight">Currency</h3>
 
         <div className="space-y-2">
           <Label htmlFor="currency">Display Currency</Label>
@@ -104,11 +192,40 @@ export default function SettingsPage() {
         >
           {updateSettings.isPending ? "Saving..." : saved ? "Saved!" : "Save Changes"}
         </Button>
+
+        <div className="flex items-center justify-between gap-4 pt-1">
+          <div>
+            <p className="text-sm font-medium">Lock Rate</p>
+            <p className="text-xs text-muted-foreground">
+              {lockRate
+                ? "Spent amounts are frozen at the rate they were entered"
+                : "Spent amounts update when the exchange rate changes"}
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={lockRate}
+            disabled={lockRateLoading || Number(exchangeRate) <= 0}
+            onClick={handleToggleLockRate}
+            className={cn(
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+              lockRate ? "bg-primary" : "bg-muted-foreground/30",
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200",
+                lockRate ? "translate-x-6" : "translate-x-1",
+              )}
+            />
+          </button>
+        </div>
       </section>
 
       {/* Appearance */}
-      <section className="rounded-xl bg-card glass-card p-4 md:p-5 space-y-4">
-        <h3 className="text-base font-bold">Appearance</h3>
+      <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
+        <h3 className="text-base font-extrabold tracking-tight">Appearance</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">Dark Mode</p>
@@ -122,9 +239,52 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* Share Budget */}
+      <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
+        <div>
+          <h3 className="text-base font-extrabold tracking-tight">Share Budget</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Generate a read-only link for family to view your budget without logging in.
+          </p>
+        </div>
+
+        {shareToken ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2">
+              <Icon name="link" size="sm" className="text-muted-foreground shrink-0" />
+              <p className="text-xs text-muted-foreground truncate flex-1 tabular-nums">{shareUrl}</p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleCopyLink} variant="outline" size="sm" className="flex-1">
+                <Icon name={copied ? "check" : "content_copy"} size="sm" className="mr-1.5" />
+                {copied ? "Copied!" : "Copy Link"}
+              </Button>
+              <Button
+                onClick={handleDisableSharing}
+                variant="outline"
+                size="sm"
+                disabled={shareLoading}
+                className="text-destructive hover:text-destructive"
+              >
+                <Icon name="link_off" size="sm" className="mr-1.5" />
+                Stop Sharing
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              The link updates automatically each time you open the budget.
+            </p>
+          </div>
+        ) : (
+          <Button onClick={handleEnableSharing} variant="outline" disabled={shareLoading}>
+            <Icon name="share" size="sm" className="mr-2" />
+            {shareLoading ? "Generating link..." : "Enable Sharing"}
+          </Button>
+        )}
+      </section>
+
       {/* Account */}
-      <section className="rounded-xl bg-card glass-card p-4 md:p-5 space-y-4">
-        <h3 className="text-base font-bold">Account</h3>
+      <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
+        <h3 className="text-base font-extrabold tracking-tight">Account</h3>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{user?.email}</p>

@@ -50,12 +50,14 @@ export function BudgetItemForm({
   const { data: settings } = useSettings()
   const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
+  const lockRate = settings?.lockRate ?? false
   const currencyLabel = currency === "USD" ? "$" : "रु"
 
   const [name, setName] = useState("")
   const [budgetAmount, setBudgetAmount] = useState("")
   const [spentAmount, setSpentAmount] = useState("")
   const [status, setStatus] = useState<BudgetItem["status"]>("draft")
+  const [itemCurrency, setItemCurrency] = useState<"USD" | "NPR">(currency)
   // Extended fields
   const [notes, setNotes] = useState("")
   const [vendorName, setVendorName] = useState("")
@@ -81,9 +83,13 @@ export function BudgetItemForm({
     if (open) {
       if (item) {
         setName(item.name)
-        // Convert stored USD to display currency
-        setBudgetAmount(String(Math.round(toDisplayAmount(item.budgetAmount, currency, rate) * 100) / 100))
-        setSpentAmount(String(Math.round(toDisplayAmount(item.spentAmount, currency, rate) * 100) / 100))
+        const eff = item.itemCurrency ?? currency
+        setItemCurrency(eff)
+        // Convert stored USD to item's effective currency
+        setBudgetAmount(String(Math.round(toDisplayAmount(item.budgetAmount, eff, rate) * 100) / 100))
+        // Use locked rate for spentAmount so the user sees the original amount they entered
+        const spentDisplayRate = item.currencyRate ?? rate
+        setSpentAmount(String(Math.round(toDisplayAmount(item.spentAmount, eff, spentDisplayRate) * 100) / 100))
         setStatus(item.status)
         // Extended fields
         setNotes(item.notes ?? "")
@@ -99,6 +105,7 @@ export function BudgetItemForm({
         setName("")
         setBudgetAmount("")
         setSpentAmount("")
+        setItemCurrency(currency)
         setStatus("draft")
         setNotes("")
         setVendorName("")
@@ -110,13 +117,30 @@ export function BudgetItemForm({
     }
   }, [open, item, currency, rate])
 
+  const handleCurrencyToggle = (newCurrency: "USD" | "NPR") => {
+    if (newCurrency === itemCurrency) return
+    // Convert currently entered amounts to the new currency's display values
+    if (budgetAmount !== "") {
+      const usd = toStorageAmount(Number(budgetAmount) || 0, itemCurrency, rate)
+      setBudgetAmount(String(Math.round(toDisplayAmount(usd, newCurrency, rate) * 100) / 100))
+    }
+    if (spentAmount !== "") {
+      const usd = toStorageAmount(Number(spentAmount) || 0, itemCurrency, rate)
+      setSpentAmount(String(Math.round(toDisplayAmount(usd, newCurrency, rate) * 100) / 100))
+    }
+    setItemCurrency(newCurrency)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Convert user-entered display currency back to USD for storage
+    const spentValue = Number(spentAmount) || 0
     onSubmit({
       name: name.trim(),
-      budgetAmount: toStorageAmount(Number(budgetAmount) || 0, currency, rate),
-      spentAmount: toStorageAmount(Number(spentAmount) || 0, currency, rate),
+      itemCurrency,
+      budgetAmount: toStorageAmount(Number(budgetAmount) || 0, itemCurrency, rate),
+      spentAmount: toStorageAmount(spentValue, itemCurrency, rate),
+      currencyRate: lockRate && spentValue > 0 && itemCurrency === "NPR" ? rate : null,
       parentId: item ? item.parentId : parentId,
       status,
       // Extended fields
@@ -146,13 +170,47 @@ export function BudgetItemForm({
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Catering"
               required
+              autoFocus
             />
           </div>
 
           {!isParent && (
             <>
+              {/* Currency toggle — controls both amount fields */}
               <div className="space-y-2">
-                <Label htmlFor="budgetAmount">Budget Amount ({currencyLabel})</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Currency</Label>
+                  <div className="flex rounded-lg overflow-hidden border border-border text-xs">
+                    <button
+                      type="button"
+                      onClick={() => handleCurrencyToggle("USD")}
+                      className={cn(
+                        "px-3 py-1.5 font-medium transition-colors",
+                        itemCurrency === "USD"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      $ USD
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCurrencyToggle("NPR")}
+                      className={cn(
+                        "px-3 py-1.5 font-medium transition-colors",
+                        itemCurrency === "NPR"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      रु NPR
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="budgetAmount">Budget Amount ({itemCurrency === "USD" ? "$" : "रु"})</Label>
                 <Input
                   id="budgetAmount"
                   type="number"
@@ -165,7 +223,7 @@ export function BudgetItemForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="spentAmount">Spent Amount ({currencyLabel})</Label>
+                <Label htmlFor="spentAmount">Spent Amount ({itemCurrency === "USD" ? "$" : "रु"})</Label>
                 <Input
                   id="spentAmount"
                   type="number"
@@ -175,6 +233,18 @@ export function BudgetItemForm({
                   onChange={(e) => setSpentAmount(e.target.value)}
                   placeholder="0"
                 />
+                {itemCurrency === "NPR" && item?.currencyRate && item.currencyRate !== rate && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <span>Recorded at rate {item.currencyRate} (current: {rate})</span>
+                    <button
+                      type="button"
+                      className="text-primary underline underline-offset-2 hover:no-underline"
+                      onClick={() => setSpentAmount(String(Math.round(toDisplayAmount(item.spentAmount, "NPR", rate) * 100) / 100))}
+                    >
+                      Use current rate
+                    </button>
+                  </p>
+                )}
               </div>
             </>
           )}
@@ -294,6 +364,7 @@ export function BudgetItemForm({
         <PaymentHistory
           budgetItemId={item.id}
           itemName={item.name}
+          budgetAmount={item.budgetAmount}
           open={showPaymentHistory}
           onOpenChange={setShowPaymentHistory}
         />

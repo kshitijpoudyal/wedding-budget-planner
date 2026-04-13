@@ -24,7 +24,7 @@ export function BudgetFinancialOverview({
   const rate = settings?.exchangeRate ?? 1
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-5">
       <SectionHeading title="Financial Overview" subtitle="The Wedding Budget" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard
@@ -32,21 +32,21 @@ export function BudgetFinancialOverview({
           value={formatCurrency(totalBudget, currency, rate)}
           icon="payments"
           iconClassName="text-primary"
-          accentColor="bg-primary"
+          iconBg="bg-primary/10"
         />
         <StatCard
           label="Finalized"
           value={formatCurrency(finalizedBudget, currency, rate)}
           icon="check_circle"
           iconClassName="text-emerald-600 dark:text-emerald-400"
-          accentColor="bg-emerald-500"
+          iconBg="bg-emerald-500/10"
         />
         <StatCard
           label="Draft"
           value={formatCurrency(draftBudget, currency, rate)}
           icon="edit_note"
           iconClassName="text-amber-600 dark:text-amber-400"
-          accentColor="bg-amber-500"
+          iconBg="bg-amber-500/10"
         />
         <StatCard
           label="Spent So Far"
@@ -54,10 +54,16 @@ export function BudgetFinancialOverview({
           icon="trending_up"
           variant={progress > 100 ? "danger" : "default"}
           iconClassName="text-tertiary"
-          accentColor="bg-tertiary"
+          iconBg={progress > 100 ? "bg-destructive/10" : "bg-tertiary/10"}
         />
       </div>
-      <ProgressBar value={totalSpent} max={totalBudget} showLabel />
+      <div className="rounded-2xl bg-card glass-card p-5">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-semibold text-foreground">Overall Progress</p>
+          <p className="text-sm font-bold tabular-nums text-muted-foreground">{Math.round(progress)}%</p>
+        </div>
+        <ProgressBar value={totalSpent} max={totalBudget} showLabel />
+      </div>
     </section>
   )
 }

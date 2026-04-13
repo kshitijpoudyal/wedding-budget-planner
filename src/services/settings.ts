@@ -4,7 +4,9 @@ import type { Settings } from "@/types"
 
 const DEFAULT_SETTINGS: Settings = {
   currency: "USD",
-  exchangeRate: 133.5,
+  exchangeRate: 147.5,
+  lockRate: false,
+  shareToken: null,
 }
 
 function settingsDocPath(userId: string) {

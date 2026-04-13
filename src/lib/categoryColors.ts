@@ -12,6 +12,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-blue-500",
     chipBg: "bg-blue-100 dark:bg-blue-900/30",
     chipCircle: "bg-blue-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-orange-500",
@@ -20,6 +22,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-orange-500",
     chipBg: "bg-orange-100 dark:bg-orange-900/30",
     chipCircle: "bg-orange-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-emerald-500",
@@ -28,6 +32,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-emerald-500",
     chipBg: "bg-emerald-100 dark:bg-emerald-900/30",
     chipCircle: "bg-emerald-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-violet-500",
@@ -36,6 +42,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-violet-500",
     chipBg: "bg-violet-100 dark:bg-violet-900/30",
     chipCircle: "bg-violet-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-rose-500",
@@ -44,6 +52,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-rose-500",
     chipBg: "bg-rose-100 dark:bg-rose-900/30",
     chipCircle: "bg-rose-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-amber-500",
@@ -52,6 +62,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-amber-500",
     chipBg: "bg-amber-100 dark:bg-amber-900/30",
     chipCircle: "bg-amber-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-teal-500",
@@ -60,6 +72,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-teal-500",
     chipBg: "bg-teal-100 dark:bg-teal-900/30",
     chipCircle: "bg-teal-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
   {
     border: "border-l-fuchsia-500",
@@ -68,6 +82,8 @@ export const CATEGORY_COLORS = [
     dot: "bg-fuchsia-500",
     chipBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30",
     chipCircle: "bg-fuchsia-500",
+    cardBg: "bg-card",
+    subCardBg: "bg-muted/50",
   },
 ] as const
 

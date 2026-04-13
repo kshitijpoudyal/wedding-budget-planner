@@ -10,14 +10,20 @@ const variants: Record<BudgetItem["status"], string> = {
 type StatusBadgeProps = {
   status: BudgetItem["status"]
   className?: string
+  onClick?: (e: React.MouseEvent) => void
 }
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
+export function StatusBadge({ status, className, onClick }: StatusBadgeProps) {
   return (
     <span
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") onClick(e as unknown as React.MouseEvent) } : undefined}
       className={cn(
         "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest",
         variants[status],
+        onClick && "cursor-pointer select-none hover:opacity-80 transition-opacity",
         className,
       )}
     >

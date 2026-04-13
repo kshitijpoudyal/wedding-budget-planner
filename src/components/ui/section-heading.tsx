@@ -8,10 +8,12 @@ type SectionHeadingProps = {
 
 export function SectionHeading({ title, subtitle, className }: SectionHeadingProps) {
   return (
-    <div className={cn("space-y-1", className)}>
-      <h2 className="text-2xl md:text-3xl font-bold text-foreground">{title}</h2>
+    <div className={cn("space-y-1.5", className)}>
+      <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground leading-tight">
+        {title}
+      </h2>
       {subtitle && (
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
+        <p className="text-sm italic text-muted-foreground">{subtitle}</p>
       )}
     </div>
   )

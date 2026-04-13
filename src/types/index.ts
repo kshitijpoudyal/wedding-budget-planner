@@ -7,12 +7,14 @@ export type BudgetItem = {
   spentAmount: number
   parentId: string | null
   status: "draft" | "finalized" | "complete"
+  itemCurrency: "USD" | "NPR" | null  // native currency for this item; null = follow global setting
   // Extended fields
   notes: string | null
   vendorName: string | null
   vendorContact: string | null
   dueDate: Timestamp | null
   paidDate: Timestamp | null
+  currencyRate: number | null  // exchange rate (NPR/USD) locked at time spentAmount was last saved
   createdAt: Timestamp
   updatedAt: Timestamp
 }
@@ -20,9 +22,14 @@ export type BudgetItem = {
 export type Settings = {
   currency: "NPR" | "USD"
   exchangeRate: number
+  lockRate: boolean  // when true, currencyRate is locked per item and won't float with rate changes
+  shareToken: string | null  // UUID for public read-only share link; null = sharing disabled
 }
 
 export type BudgetItemInput = Omit<BudgetItem, "id" | "createdAt" | "updatedAt">
+
+export const PAYMENT_METHODS = ["cash", "card", "bank", "other"] as const
+export type PaymentMethod = typeof PAYMENT_METHODS[number]
 
 // Payment tracking for partial payments / installments
 export type Payment = {
@@ -30,9 +37,28 @@ export type Payment = {
   budgetItemId: string
   amount: number
   date: Timestamp
-  method: "cash" | "card" | "bank" | "other" | null
+  method: PaymentMethod | null
   note: string | null
   createdAt: Timestamp
 }
 
 export type PaymentInput = Omit<Payment, "id" | "createdAt">
+
+export type SearchFilter = "all" | "name" | "vendor" | "notes"
+
+// Serialized snapshot stored in publicBudgets/{shareToken} for read-only family sharing
+export type SharedBudgetSnapshot = {
+  userId: string
+  items: Array<{
+    id: string
+    name: string
+    budgetAmount: number
+    spentAmount: number
+    parentId: string | null
+    status: "draft" | "finalized" | "complete"
+    vendorName: string | null
+    itemCurrency: "USD" | "NPR" | null
+  }>
+  settings: { currency: "USD" | "NPR"; exchangeRate: number }
+  updatedAt: string // ISO string
+}

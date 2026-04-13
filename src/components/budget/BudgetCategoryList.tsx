@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react"
+import { useDebounce } from "@/hooks/useDebounce"
 import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { SectionHeading } from "@/components/ui/section-heading"
 import { BudgetCategoryCard } from "./BudgetCategoryCard"
-import { BudgetToolbar, type SearchFilter } from "./BudgetToolbar"
+import { BudgetToolbar } from "./BudgetToolbar"
+import type { SearchFilter } from "@/types"
 import { BulkActionBar } from "./BulkActionBar"
 import { sortNodes } from "./sortNodes"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
@@ -18,6 +20,8 @@ type BudgetCategoryListProps = {
   onAddRoot: () => void
   onBulkStatusChange: (ids: string[], status: BudgetItem["status"]) => void
   bulkUpdateLoading?: boolean
+  onStatusChange?: (id: string, newStatus: BudgetItem["status"]) => void
+  onInlineUpdate?: (id: string, field: "budgetAmount" | "spentAmount", displayValue: number) => void
 }
 
 // Helper to collect all item IDs from tree nodes recursively
@@ -83,16 +87,19 @@ export function BudgetCategoryList({
   onAddRoot,
   onBulkStatusChange,
   bulkUpdateLoading,
+  onStatusChange,
+  onInlineUpdate,
 }: BudgetCategoryListProps) {
   const [sort, setSort] = useState("budget-desc")
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search, 200)
   const [searchFilter, setSearchFilter] = useState<SearchFilter>("all")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [selectionMode, setSelectionMode] = useState(false)
 
   const filteredTree = useMemo(
-    () => filterTree(tree, search, searchFilter),
-    [tree, search, searchFilter]
+    () => filterTree(tree, debouncedSearch, searchFilter),
+    [tree, debouncedSearch, searchFilter]
   )
   const sortedTree = useMemo(() => sortNodes(filteredTree, sort), [filteredTree, sort])
   const allIds = useMemo(() => collectAllIds(filteredTree), [filteredTree])
@@ -142,6 +149,7 @@ export function BudgetCategoryList({
         onClearSelection={clearSelection}
         onAdd={onAddRoot}
         hasItems={tree.length > 0}
+        className="sticky top-4 md:top-6 z-20"
       />
 
       {sortedTree.length === 0 && tree.length === 0 ? (
@@ -182,6 +190,8 @@ export function BudgetCategoryList({
               selectionMode={selectionMode}
               selectedIds={selectedIds}
               onToggleSelection={toggleSelection}
+              onStatusChange={onStatusChange}
+              onInlineUpdate={onInlineUpdate}
             />
           ))}
         </div>

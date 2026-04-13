@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { BudgetFinancialOverview } from "@/components/budget/BudgetFinancialOverview"
@@ -13,11 +13,21 @@ import {
   useDeleteBudgetItem,
   useBulkUpdateStatus,
 } from "@/hooks/useBudgetItemMutations"
+import { useBudgetItems } from "@/hooks/useBudgetItems"
+import { useMigrateSpentRates } from "@/hooks/useMigrateSpentRates"
+import { useUserId } from "@/contexts/AuthContext"
+import { useSettings } from "@/hooks/useSettings"
+import { toStorageAmount } from "@/lib/currency"
+import { publishSharedBudget } from "@/services/sharing"
 import type { BudgetItem, BudgetItemInput } from "@/types"
 
 export default function BudgetPage() {
   const { tree, grandTotalBudget, grandTotalSpent, finalizedBudget, draftBudget, progress, isLoading, isError, error } =
     useBudgetTree()
+  const { data: items } = useBudgetItems()
+  const { data: settings } = useSettings()
+  const userId = useUserId()
+  useMigrateSpentRates(userId, items)
 
   const createMutation = useCreateBudgetItem()
   const updateMutation = useUpdateBudgetItem()
@@ -27,6 +37,26 @@ export default function BudgetPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingNode, setEditingNode] = useState<BudgetTreeNode | null>(null)
   const [newParentId, setNewParentId] = useState<string | null>(null)
+
+  // Auto-refresh public share snapshot whenever budget data loads
+  useEffect(() => {
+    if (!settings?.shareToken || !items || items.length === 0) return
+    publishSharedBudget(settings.shareToken, {
+      userId,
+      items: items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        budgetAmount: item.budgetAmount,
+        spentAmount: item.spentAmount,
+        parentId: item.parentId,
+        status: item.status,
+        vendorName: item.vendorName,
+        itemCurrency: item.itemCurrency,
+      })),
+      settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
+      updatedAt: new Date().toISOString(),
+    }).catch(() => {}) // silently ignore publish errors
+  }, [items, settings?.shareToken]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAdd = () => {
     setEditingNode(null)
@@ -52,6 +82,28 @@ export default function BudgetPage() {
 
   const handleBulkStatusChange = (ids: string[], status: BudgetItem["status"]) => {
     bulkUpdateMutation.mutate({ ids, status })
+  }
+
+  const handleStatusChange = (id: string, newStatus: BudgetItem["status"]) => {
+    updateMutation.mutate({ id, data: { status: newStatus } as Partial<BudgetItemInput> })
+  }
+
+  const handleInlineUpdate = (id: string, field: "budgetAmount" | "spentAmount", displayValue: number) => {
+    const item = items?.find((i) => i.id === id)
+    const currency = settings?.currency ?? "USD"
+    const rate = settings?.exchangeRate ?? 1
+    const lockRate = settings?.lockRate ?? false
+
+    // Use item's native currency for conversion, fall back to global
+    const effectiveCurrency = item?.itemCurrency ?? currency
+    const usdValue = toStorageAmount(displayValue, effectiveCurrency, rate)
+
+    const data: Partial<BudgetItemInput> = { [field]: usdValue }
+    // Lock the exchange rate on spent updates if lockRate is enabled and item is an NPR item
+    if (field === "spentAmount" && lockRate && effectiveCurrency === "NPR" && displayValue > 0) {
+      data.currencyRate = rate
+    }
+    updateMutation.mutate({ id, data })
   }
 
   const handleSubmit = (data: BudgetItemInput) => {
@@ -103,6 +155,8 @@ export default function BudgetPage() {
         onAddRoot={handleAdd}
         onBulkStatusChange={handleBulkStatusChange}
         bulkUpdateLoading={bulkUpdateMutation.isPending}
+        onStatusChange={handleStatusChange}
+        onInlineUpdate={handleInlineUpdate}
       />
 
       <QuoteBlock />
