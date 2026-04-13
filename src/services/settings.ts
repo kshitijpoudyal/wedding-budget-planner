@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS: Settings = {
   currency: "USD",
   exchangeRate: 147.5,
   lockRate: false,
-  shareToken: null,
+  sharingEnabled: false,
 }
 
 function settingsDocPath(userId: string) {

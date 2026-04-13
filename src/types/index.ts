@@ -23,7 +23,7 @@ export type Settings = {
   currency: "NPR" | "USD"
   exchangeRate: number
   lockRate: boolean  // when true, currencyRate is locked per item and won't float with rate changes
-  shareToken: string | null  // UUID for public read-only share link; null = sharing disabled
+  sharingEnabled: boolean  // when true, budget is publicly readable at /shared/{userId}
 }
 
 export type BudgetItemInput = Omit<BudgetItem, "id" | "createdAt" | "updatedAt">

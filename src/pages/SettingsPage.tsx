@@ -40,7 +40,7 @@ export default function SettingsPage() {
   const [lockRate, setLockRate] = useState(false)
   const [lockRateLoading, setLockRateLoading] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [shareToken, setShareToken] = useState<string | null>(null)
+  const [sharingEnabled, setSharingEnabled] = useState(false)
   const [shareLoading, setShareLoading] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -49,73 +49,51 @@ export default function SettingsPage() {
       setCurrency(settings.currency)
       setExchangeRate(String(settings.exchangeRate))
       setLockRate(settings.lockRate ?? false)
-      setShareToken(settings.shareToken ?? null)
-      // Re-publish snapshot for existing tokens (handles tokens created before publish-on-enable fix)
-      if (settings.shareToken && items && items.length > 0) {
-        publishSharedBudget(settings.shareToken, {
-          userId,
-          items: items.map((item) => ({
-            id: item.id,
-            name: item.name,
-            budgetAmount: item.budgetAmount,
-            spentAmount: item.spentAmount,
-            parentId: item.parentId,
-            status: item.status,
-            vendorName: item.vendorName,
-            itemCurrency: item.itemCurrency,
-          })),
-          settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
-          updatedAt: new Date().toISOString(),
-        }).catch(() => {})
-      }
+      setSharingEnabled(settings.sharingEnabled ?? false)
     }
-  }, [settings, items])
+  }, [settings])
 
-  const shareUrl = shareToken ? `${window.location.origin}/shared/${shareToken}` : null
+  const shareUrl = `${window.location.origin}/shared/${userId}`
+
+  const buildSnapshot = () => ({
+    userId,
+    items: (items ?? []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      budgetAmount: item.budgetAmount,
+      spentAmount: item.spentAmount,
+      parentId: item.parentId,
+      status: item.status,
+      vendorName: item.vendorName,
+      itemCurrency: item.itemCurrency,
+    })),
+    settings: { currency: settings!.currency, exchangeRate: settings!.exchangeRate },
+    updatedAt: new Date().toISOString(),
+  })
 
   const handleEnableSharing = async () => {
     setShareLoading(true)
     try {
-      const token = crypto.randomUUID()
-      await updateSettings.mutateAsync({ shareToken: token })
-      setShareToken(token)
-      // Immediately publish a snapshot so the link works right away
-      if (items && items.length > 0 && settings) {
-        await publishSharedBudget(token, {
-          userId,
-          items: items.map((item) => ({
-            id: item.id,
-            name: item.name,
-            budgetAmount: item.budgetAmount,
-            spentAmount: item.spentAmount,
-            parentId: item.parentId,
-            status: item.status,
-            vendorName: item.vendorName,
-            itemCurrency: item.itemCurrency,
-          })),
-          settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
-          updatedAt: new Date().toISOString(),
-        }).catch(() => {})
-      }
+      await publishSharedBudget(userId, buildSnapshot())
+      await updateSettings.mutateAsync({ sharingEnabled: true })
+      setSharingEnabled(true)
     } finally {
       setShareLoading(false)
     }
   }
 
   const handleDisableSharing = async () => {
-    if (!shareToken) return
     setShareLoading(true)
     try {
-      await deleteSharedBudget(shareToken)
-      await updateSettings.mutateAsync({ shareToken: null })
-      setShareToken(null)
+      await deleteSharedBudget(userId)
+      await updateSettings.mutateAsync({ sharingEnabled: false })
+      setSharingEnabled(false)
     } finally {
       setShareLoading(false)
     }
   }
 
   const handleCopyLink = async () => {
-    if (!shareUrl) return
     await navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -280,11 +258,11 @@ export default function SettingsPage() {
         <div>
           <h3 className="text-base font-extrabold tracking-tight">Share Budget</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Generate a read-only link for family to view your budget without logging in.
+            Share a fixed read-only link with family. The URL never changes — just toggle access on or off.
           </p>
         </div>
 
-        {shareToken ? (
+        {sharingEnabled ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2">
               <Icon name="link" size="sm" className="text-muted-foreground shrink-0" />
@@ -307,13 +285,13 @@ export default function SettingsPage() {
               </Button>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              The link updates automatically each time you open the budget.
+              Updates automatically whenever you make changes to the budget.
             </p>
           </div>
         ) : (
-          <Button onClick={handleEnableSharing} variant="outline" disabled={shareLoading}>
+          <Button onClick={handleEnableSharing} variant="outline" disabled={shareLoading || !settings}>
             <Icon name="share" size="sm" className="mr-2" />
-            {shareLoading ? "Generating link..." : "Enable Sharing"}
+            {shareLoading ? "Enabling..." : "Enable Sharing"}
           </Button>
         )}
       </section>

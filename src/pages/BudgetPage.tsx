@@ -38,10 +38,10 @@ export default function BudgetPage() {
   const [editingNode, setEditingNode] = useState<BudgetTreeNode | null>(null)
   const [newParentId, setNewParentId] = useState<string | null>(null)
 
-  // Auto-refresh public share snapshot whenever budget data loads
+  // Auto-refresh public share snapshot whenever budget data changes
   useEffect(() => {
-    if (!settings?.shareToken || !items || items.length === 0) return
-    publishSharedBudget(settings.shareToken, {
+    if (!settings?.sharingEnabled || !items || items.length === 0) return
+    publishSharedBudget(userId, {
       userId,
       items: items.map((item) => ({
         id: item.id,
@@ -56,7 +56,7 @@ export default function BudgetPage() {
       settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
       updatedAt: new Date().toISOString(),
     }).catch(() => {}) // silently ignore publish errors
-  }, [items, settings?.shareToken]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [items, settings?.sharingEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAdd = () => {
     setEditingNode(null)
