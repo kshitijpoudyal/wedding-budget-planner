@@ -255,45 +255,55 @@ export default function SettingsPage() {
 
       {/* Share Budget */}
       <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
-        <div>
-          <h3 className="text-base font-extrabold tracking-tight">Share Budget</h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            Share a fixed read-only link with family. The URL never changes — just toggle access on or off.
-          </p>
-        </div>
+        <h3 className="text-base font-extrabold tracking-tight">Share Budget</h3>
 
-        {sharingEnabled ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2">
-              <Icon name="link" size="sm" className="text-muted-foreground shrink-0" />
-              <p className="text-xs text-muted-foreground truncate flex-1 tabular-nums">{shareUrl}</p>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleCopyLink} variant="outline" size="sm" className="flex-1">
-                <Icon name={copied ? "check" : "content_copy"} size="sm" className="mr-1.5" />
-                {copied ? "Copied!" : "Copy Link"}
-              </Button>
-              <Button
-                onClick={handleDisableSharing}
-                variant="outline"
-                size="sm"
-                disabled={shareLoading}
-                className="text-destructive hover:text-destructive"
-              >
-                <Icon name="link_off" size="sm" className="mr-1.5" />
-                Stop Sharing
-              </Button>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              Updates automatically whenever you make changes to the budget.
+        {/* Toggle row */}
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium">Enable Sharing</p>
+            <p className="text-xs text-muted-foreground">
+              {sharingEnabled ? "Anyone with the link can view your budget" : "Budget is private"}
             </p>
           </div>
-        ) : (
-          <Button onClick={handleEnableSharing} variant="outline" disabled={shareLoading || !settings}>
-            <Icon name="share" size="sm" className="mr-2" />
-            {shareLoading ? "Enabling..." : "Enable Sharing"}
-          </Button>
-        )}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={sharingEnabled}
+            disabled={shareLoading || !settings}
+            onClick={sharingEnabled ? handleDisableSharing : handleEnableSharing}
+            className={cn(
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
+              sharingEnabled ? "bg-primary" : "bg-muted-foreground/30",
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200",
+                sharingEnabled ? "translate-x-6" : "translate-x-1",
+              )}
+            />
+          </button>
+        </div>
+
+        {/* Always-visible link row */}
+        <div className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2">
+          <Icon name="link" size="sm" className={sharingEnabled ? "text-primary shrink-0" : "text-muted-foreground shrink-0"} />
+          <p className="text-xs text-muted-foreground truncate flex-1 tabular-nums">{shareUrl}</p>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+            title="Copy link"
+          >
+            <Icon name={copied ? "check" : "content_copy"} size="sm" />
+          </button>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground">
+          {sharingEnabled
+            ? "Updates automatically whenever you make changes to the budget."
+            : "Enable sharing so family can view your budget without logging in."}
+        </p>
       </section>
 
       {/* Account */}
