@@ -17,7 +17,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 export default function LoginPage() {
   const navigate = useNavigate()
   const [email, setEmail] = useState("kshitijpoudyal@gmail.com")
-  const [password, setPassword] = useState("Password123")
+  const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
