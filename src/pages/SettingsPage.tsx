@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { deleteSharedBudget } from "@/services/sharing"
+import { deleteSharedBudget, publishSharedBudget } from "@/services/sharing"
 import {
   Select,
   SelectContent,
@@ -61,6 +61,24 @@ export default function SettingsPage() {
       const token = crypto.randomUUID()
       await updateSettings.mutateAsync({ shareToken: token })
       setShareToken(token)
+      // Immediately publish a snapshot so the link works right away
+      if (items && items.length > 0 && settings) {
+        await publishSharedBudget(token, {
+          userId,
+          items: items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            budgetAmount: item.budgetAmount,
+            spentAmount: item.spentAmount,
+            parentId: item.parentId,
+            status: item.status,
+            vendorName: item.vendorName,
+            itemCurrency: item.itemCurrency,
+          })),
+          settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
+          updatedAt: new Date().toISOString(),
+        }).catch(() => {})
+      }
     } finally {
       setShareLoading(false)
     }
