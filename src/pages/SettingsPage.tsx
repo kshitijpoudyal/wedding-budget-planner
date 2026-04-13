@@ -50,8 +50,26 @@ export default function SettingsPage() {
       setExchangeRate(String(settings.exchangeRate))
       setLockRate(settings.lockRate ?? false)
       setShareToken(settings.shareToken ?? null)
+      // Re-publish snapshot for existing tokens (handles tokens created before publish-on-enable fix)
+      if (settings.shareToken && items && items.length > 0) {
+        publishSharedBudget(settings.shareToken, {
+          userId,
+          items: items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            budgetAmount: item.budgetAmount,
+            spentAmount: item.spentAmount,
+            parentId: item.parentId,
+            status: item.status,
+            vendorName: item.vendorName,
+            itemCurrency: item.itemCurrency,
+          })),
+          settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
+          updatedAt: new Date().toISOString(),
+        }).catch(() => {})
+      }
     }
-  }, [settings])
+  }, [settings, items])
 
   const shareUrl = shareToken ? `${window.location.origin}/shared/${shareToken}` : null
 
