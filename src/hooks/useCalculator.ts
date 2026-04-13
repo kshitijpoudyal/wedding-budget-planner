@@ -57,7 +57,7 @@ export function useCalculator() {
     localStorage.setItem("calc_history", JSON.stringify(history))
   }, [history])
 
-  const { display, previousValue, operation, waitingForOperand } = state
+  const { display, previousValue, operation } = state
 
   const inputDigit = (digit: string) => {
     setState((s) =>
