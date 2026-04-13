@@ -51,7 +51,6 @@ export function BudgetItemForm({
   const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
   const lockRate = settings?.lockRate ?? false
-  const currencyLabel = currency === "USD" ? "$" : "रु"
 
   const [name, setName] = useState("")
   const [budgetAmount, setBudgetAmount] = useState("")

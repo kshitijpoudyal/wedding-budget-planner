@@ -22,25 +22,29 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { usePayments, useCreatePayment, useDeletePayment } from "@/hooks/usePayments"
 import { useSettings } from "@/hooks/useSettings"
 import { formatCurrency } from "@/lib/currency"
+import { cn, formatDate } from "@/lib/utils"
+import { PAYMENT_METHODS } from "@/types"
 import type { PaymentInput } from "@/types"
 
 type PaymentHistoryProps = {
   budgetItemId: string
   itemName: string
+  budgetAmount: number
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-const PAYMENT_METHODS = [
-  { value: "cash", label: "Cash" },
-  { value: "card", label: "Card" },
-  { value: "bank", label: "Bank Transfer" },
-  { value: "other", label: "Other" },
-] as const
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  cash: "Cash",
+  card: "Card",
+  bank: "Bank Transfer",
+  other: "Other",
+}
 
 export function PaymentHistory({
   budgetItemId,
   itemName,
+  budgetAmount,
   open,
   onOpenChange,
 }: PaymentHistoryProps) {
@@ -67,6 +71,7 @@ export function PaymentHistory({
   })
 
   const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0)
+  const remaining = budgetAmount - totalPaid
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -91,7 +96,7 @@ export function PaymentHistory({
 
   const handleDelete = async () => {
     if (!deleteId) return
-    await deletePayment.mutateAsync(deleteId)
+    await deletePayment.mutateAsync({ id: deleteId, budgetItemId })
     setDeleteId(null)
   }
 
@@ -107,11 +112,27 @@ export function PaymentHistory({
           <div className="mt-6 space-y-4">
             {/* Total summary */}
             <div className="rounded-lg bg-surface-container-low glass-surface p-4">
-              <p className="text-sm text-muted-foreground">Total Paid</p>
-              <p className="text-2xl font-bold tabular-nums">
-                {formatCurrency(totalPaid, currency, rate)}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Paid</p>
+                  <p className="text-base font-bold tabular-nums">
+                    {formatCurrency(totalPaid, currency, rate)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Budget</p>
+                  <p className="text-base font-bold tabular-nums">
+                    {formatCurrency(budgetAmount, currency, rate)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Remaining</p>
+                  <p className={cn("text-base font-bold tabular-nums", remaining < 0 && "text-destructive")}>
+                    {formatCurrency(remaining, currency, rate)}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
                 {payments.length} payment{payments.length !== 1 ? "s" : ""}
               </p>
             </div>
@@ -162,9 +183,9 @@ export function PaymentHistory({
                       <SelectValue placeholder="Select method" />
                     </SelectTrigger>
                     <SelectContent>
-                      {PAYMENT_METHODS.map((m) => (
-                        <SelectItem key={m.value} value={m.value}>
-                          {m.label}
+                      {PAYMENT_METHODS.map((value) => (
+                        <SelectItem key={value} value={value}>
+                          {PAYMENT_METHOD_LABELS[value]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -217,11 +238,7 @@ export function PaymentHistory({
                       </p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span>
-                          {payment.date.toDate().toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                          {formatDate(payment.date, { month: "short", day: "numeric", year: "numeric" })}
                         </span>
                         {payment.method && (
                           <>
