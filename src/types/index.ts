@@ -46,19 +46,10 @@ export type PaymentInput = Omit<Payment, "id" | "createdAt">
 
 export type SearchFilter = "all" | "name" | "vendor" | "notes"
 
-// Serialized snapshot stored in publicBudgets/{shareToken} for read-only family sharing
+// Serialized snapshot stored in publicBudgets/{userId} for read-only family sharing
 export type SharedBudgetSnapshot = {
   userId: string
-  items: Array<{
-    id: string
-    name: string
-    budgetAmount: number
-    spentAmount: number
-    parentId: string | null
-    status: "draft" | "finalized" | "complete"
-    vendorName: string | null
-    itemCurrency: "USD" | "NPR" | null
-  }>
+  items: BudgetItem[]
   settings: { currency: "USD" | "NPR"; exchangeRate: number }
   updatedAt: string // ISO string
 }

@@ -4,60 +4,49 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Icon } from "@/components/ui/icon"
 import { BudgetFinancialOverview } from "@/components/budget/BudgetFinancialOverview"
 import { BudgetCategoryList } from "@/components/budget/BudgetCategoryList"
+import { QuoteBlock } from "@/components/ui/quote-block"
 import { getSharedBudget } from "@/services/sharing"
-import type { SharedBudgetSnapshot, Settings } from "@/types"
+import type { BudgetItem, Settings, SharedBudgetSnapshot } from "@/types"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
-import type { BudgetItem } from "@/types"
-import type { Timestamp } from "firebase/firestore"
 
-const FAKE_TIMESTAMP = { toMillis: () => 0, toDate: () => new Date(0), seconds: 0, nanoseconds: 0 } as unknown as Timestamp
-
-function toTreeNode(items: SharedBudgetSnapshot["items"], parentId: string | null): BudgetTreeNode[] {
+// Exact same logic as useBudgetTree.ts
+function buildTree(items: BudgetItem[], parentId: string | null): BudgetTreeNode[] {
   return items
     .filter((item) => item.parentId === parentId)
     .map((item) => {
-      const children = toTreeNode(items, item.id)
+      const children = buildTree(items, item.id)
       const isLeaf = children.length === 0
-      const totalBudget = isLeaf ? item.budgetAmount : children.reduce((s, c) => s + c.totalBudget, 0)
-      const totalSpent = isLeaf ? item.spentAmount : children.reduce((s, c) => s + c.totalSpent, 0)
-      const budgetItem: BudgetItem = {
-        id: item.id,
-        name: item.name,
-        budgetAmount: item.budgetAmount,
-        spentAmount: item.spentAmount,
-        parentId: item.parentId,
-        status: item.status,
-        itemCurrency: item.itemCurrency,
-        vendorName: item.vendorName,
-        notes: null,
-        vendorContact: null,
-        dueDate: null,
-        paidDate: null,
-        currencyRate: null,
-        createdAt: FAKE_TIMESTAMP,
-        updatedAt: FAKE_TIMESTAMP,
-      }
-      return { item: budgetItem, children, totalBudget, totalSpent, isLeaf }
+      const totalBudget = isLeaf
+        ? item.budgetAmount
+        : children.reduce((sum, child) => sum + child.totalBudget, 0)
+      const totalSpent = isLeaf
+        ? item.spentAmount
+        : children.reduce((sum, child) => sum + child.totalSpent, 0)
+      return { item, children, totalBudget, totalSpent, isLeaf }
     })
 }
 
-function computeOverviewTotals(tree: BudgetTreeNode[]) {
-  let grandBudget = 0, grandSpent = 0, finalizedBudget = 0, draftBudget = 0
+function computeStats(tree: BudgetTreeNode[]) {
+  const grandTotalBudget = tree.reduce((s, n) => s + n.totalBudget, 0)
+  const grandTotalSpent = tree.reduce((s, n) => s + n.totalSpent, 0)
+  let finalizedBudget = 0
+  let draftBudget = 0
 
-  function walk(nodes: BudgetTreeNode[]) {
+  function sumByStatus(nodes: BudgetTreeNode[]) {
     for (const node of nodes) {
       if (node.isLeaf) {
-        grandBudget += node.item.budgetAmount
-        grandSpent += node.item.spentAmount
         if (node.item.status === "finalized") finalizedBudget += node.item.budgetAmount
-        else if (node.item.status === "draft") draftBudget += node.item.budgetAmount
+        else if (node.item.status === "complete") { /* included in finalized display */ }
+        else draftBudget += node.item.budgetAmount
       } else {
-        walk(node.children)
+        sumByStatus(node.children)
       }
     }
   }
-  walk(tree)
-  return { grandBudget, grandSpent, finalizedBudget, draftBudget }
+  sumByStatus(tree)
+
+  const progress = grandTotalBudget > 0 ? (grandTotalSpent / grandTotalBudget) * 100 : 0
+  return { grandTotalBudget, grandTotalSpent, finalizedBudget, draftBudget, progress }
 }
 
 const NOOP = () => {}
@@ -76,8 +65,6 @@ export default function SharedBudgetPage() {
         if (!data) {
           setNotFound(true)
         } else {
-          // Seed snapshot settings into the query cache so useSettings()
-          // inside child components returns the correct currency/rate
           const settings: Settings = {
             currency: data.settings.currency,
             exchangeRate: data.settings.exchangeRate,
@@ -94,7 +81,7 @@ export default function SharedBudgetPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground">Loading budget...</p>
       </div>
     )
@@ -110,13 +97,12 @@ export default function SharedBudgetPage() {
     )
   }
 
-  const tree = toTreeNode(snapshot.items, null)
-  const { grandBudget, grandSpent, finalizedBudget, draftBudget } = computeOverviewTotals(tree)
-  const progress = grandBudget > 0 ? (grandSpent / grandBudget) * 100 : 0
+  const tree = buildTree(snapshot.items, null)
+  const { grandTotalBudget, grandTotalSpent, finalizedBudget, draftBudget, progress } = computeStats(tree)
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* View-only banner */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b border-border/40 px-5 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -135,10 +121,11 @@ export default function SharedBudgetPage() {
         </div>
       </div>
 
+      {/* Exact same layout as BudgetPage */}
       <div className="p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
         <BudgetFinancialOverview
-          totalBudget={grandBudget}
-          totalSpent={grandSpent}
+          totalBudget={grandTotalBudget}
+          totalSpent={grandTotalSpent}
           finalizedBudget={finalizedBudget}
           draftBudget={draftBudget}
           progress={progress}
@@ -155,6 +142,8 @@ export default function SharedBudgetPage() {
           onBulkStatusChange={NOOP}
           readOnly
         />
+
+        <QuoteBlock />
       </div>
     </div>
   )

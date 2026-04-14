@@ -66,8 +66,15 @@ export default function SettingsPage() {
       spentAmount: item.spentAmount ?? 0,
       parentId: item.parentId ?? null,
       status: item.status ?? "draft",
-      vendorName: item.vendorName ?? null,
       itemCurrency: item.itemCurrency ?? null,
+      notes: item.notes ?? null,
+      vendorName: item.vendorName ?? null,
+      vendorContact: item.vendorContact ?? null,
+      dueDate: item.dueDate ?? null,
+      paidDate: item.paidDate ?? null,
+      currencyRate: item.currencyRate ?? null,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
     })),
     settings: { currency: settings!.currency, exchangeRate: settings!.exchangeRate },
     updatedAt: new Date().toISOString(),
@@ -109,45 +116,31 @@ export default function SettingsPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleSave = () => {
-    const rate = Number(exchangeRate)
-    if (rate <= 0) return
-    updateSettings.mutate(
-      { currency, exchangeRate: rate },
-      {
-        onSuccess: () => {
-          setSaved(true)
-          setTimeout(() => setSaved(false), 2000)
-        },
-      },
-    )
-  }
-
-  const handleToggleLockRate = async () => {
+  const handleSave = async () => {
     const rate = Number(exchangeRate)
     if (rate <= 0 || lockRateLoading) return
 
-    const newLockRate = !lockRate
-    setLockRate(newLockRate)
     setLockRateLoading(true)
-
     try {
-      await updateSettings.mutateAsync({ lockRate: newLockRate })
+      await updateSettings.mutateAsync({ currency, exchangeRate: rate, lockRate })
 
       const allItems = items ?? []
-      const toUpdate = newLockRate
-        ? allItems.filter((item) => item.spentAmount > 0)
-        : allItems
-      const ids = toUpdate.map((item) => item.id)
-
-      if (ids.length > 0) {
-        await bulkUpdateBudgetItems(userId, ids, {
-          currencyRate: newLockRate ? rate : null,
-        })
+      const prevLockRate = settings?.lockRate ?? false
+      if (lockRate !== prevLockRate) {
+        const toUpdate = lockRate
+          ? allItems.filter((item) => item.spentAmount > 0)
+          : allItems
+        const ids = toUpdate.map((item) => item.id)
+        if (ids.length > 0) {
+          await bulkUpdateBudgetItems(userId, ids, {
+            currencyRate: lockRate ? rate : null,
+          })
+        }
       }
+
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
     } catch (e) {
-      // Revert optimistic toggle on failure
-      setLockRate(!newLockRate)
       console.error(e)
     } finally {
       setLockRateLoading(false)
@@ -210,13 +203,6 @@ export default function SettingsPage() {
           )}
         </div>
 
-        <Button
-          onClick={handleSave}
-          disabled={updateSettings.isPending || Number(exchangeRate) <= 0}
-        >
-          {updateSettings.isPending ? "Saving..." : saved ? "Saved!" : "Save Changes"}
-        </Button>
-
         <div className="flex items-center justify-between gap-4 pt-1">
           <div>
             <p className="text-sm font-medium">Lock Rate</p>
@@ -231,7 +217,7 @@ export default function SettingsPage() {
             role="switch"
             aria-checked={lockRate}
             disabled={lockRateLoading || Number(exchangeRate) <= 0}
-            onClick={handleToggleLockRate}
+            onClick={() => setLockRate((v) => !v)}
             className={cn(
               "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
               lockRate ? "bg-primary" : "bg-muted-foreground/30",
@@ -245,6 +231,13 @@ export default function SettingsPage() {
             />
           </button>
         </div>
+
+        <Button
+          onClick={handleSave}
+          disabled={lockRateLoading || Number(exchangeRate) <= 0}
+        >
+          {lockRateLoading ? "Saving..." : saved ? "Saved!" : "Save Changes"}
+        </Button>
       </section>
 
       {/* Appearance */}
