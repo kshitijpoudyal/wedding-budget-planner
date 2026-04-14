@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { BudgetFinancialOverview } from "@/components/budget/BudgetFinancialOverview"
@@ -18,7 +18,6 @@ import { useMigrateSpentRates } from "@/hooks/useMigrateSpentRates"
 import { useUserId } from "@/contexts/AuthContext"
 import { useSettings } from "@/hooks/useSettings"
 import { toStorageAmount } from "@/lib/currency"
-import { publishSharedBudget } from "@/services/sharing"
 import type { BudgetItem, BudgetItemInput } from "@/types"
 
 export default function BudgetPage() {
@@ -37,33 +36,6 @@ export default function BudgetPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingNode, setEditingNode] = useState<BudgetTreeNode | null>(null)
   const [newParentId, setNewParentId] = useState<string | null>(null)
-
-  // Auto-refresh public share snapshot whenever budget data changes
-  useEffect(() => {
-    if (!settings?.sharingEnabled || !items || items.length === 0) return
-    publishSharedBudget(userId, {
-      userId,
-      items: items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        budgetAmount: item.budgetAmount ?? 0,
-        spentAmount: item.spentAmount ?? 0,
-        parentId: item.parentId ?? null,
-        status: item.status ?? "draft",
-        itemCurrency: item.itemCurrency ?? null,
-        notes: item.notes ?? null,
-        vendorName: item.vendorName ?? null,
-        vendorContact: item.vendorContact ?? null,
-        dueDate: item.dueDate ?? null,
-        paidDate: item.paidDate ?? null,
-        currencyRate: item.currencyRate ?? null,
-        ...(item.createdAt ? { createdAt: item.createdAt } : {}),
-        ...(item.updatedAt ? { updatedAt: item.updatedAt } : {}),
-      })),
-      settings: { currency: settings.currency, exchangeRate: settings.exchangeRate },
-      updatedAt: new Date().toISOString(),
-    }).catch(() => {}) // silently ignore publish errors
-  }, [items, settings?.sharingEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAdd = () => {
     setEditingNode(null)

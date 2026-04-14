@@ -57,34 +57,11 @@ export default function SettingsPage() {
   const appOrigin = import.meta.env.VITE_APP_URL ?? window.location.origin
   const shareUrl = `${appOrigin}/shared/${userId}`
 
-  const buildSnapshot = () => ({
-    userId,
-    items: (items ?? []).map((item) => ({
-      id: item.id,
-      name: item.name,
-      budgetAmount: item.budgetAmount ?? 0,
-      spentAmount: item.spentAmount ?? 0,
-      parentId: item.parentId ?? null,
-      status: item.status ?? "draft",
-      itemCurrency: item.itemCurrency ?? null,
-      notes: item.notes ?? null,
-      vendorName: item.vendorName ?? null,
-      vendorContact: item.vendorContact ?? null,
-      dueDate: item.dueDate ?? null,
-      paidDate: item.paidDate ?? null,
-      currencyRate: item.currencyRate ?? null,
-      ...(item.createdAt ? { createdAt: item.createdAt } : {}),
-      ...(item.updatedAt ? { updatedAt: item.updatedAt } : {}),
-    })),
-    settings: { currency: settings!.currency, exchangeRate: settings!.exchangeRate },
-    updatedAt: new Date().toISOString(),
-  })
-
   const handleEnableSharing = async () => {
     setShareLoading(true)
     setShareError(null)
     try {
-      await publishSharedBudget(userId, buildSnapshot())
+      await publishSharedBudget(userId)
       await updateSettings.mutateAsync({ sharingEnabled: true })
       setSharingEnabled(true)
     } catch (e) {
@@ -291,10 +268,15 @@ export default function SettingsPage() {
         {sharingEnabled && (
           <div className="rounded-xl bg-muted/50 px-3 py-3 space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <Icon name="link" size="sm" className="text-primary shrink-0" />
+              <a
+                href={shareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 min-w-0 group"
+              >
+                <Icon name="link" size="sm" className="text-primary/70 group-hover:text-primary shrink-0 transition-colors duration-200" />
                 <p className="text-xs font-medium text-foreground">Share link</p>
-              </div>
+              </a>
               <button
                 type="button"
                 onClick={handleCopyLink}
@@ -312,11 +294,6 @@ export default function SettingsPage() {
         {shareError && (
           <p className="text-[11px] text-destructive">{shareError}</p>
         )}
-        <p className="text-[11px] text-muted-foreground">
-          {sharingEnabled
-            ? "Updates automatically whenever you make changes to the budget."
-            : "Enable sharing so family can view your budget without logging in."}
-        </p>
       </section>
 
       {/* Account */}
