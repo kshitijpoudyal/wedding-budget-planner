@@ -10,48 +10,35 @@ import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
 import type { BudgetItem } from "@/types"
 import type { Timestamp } from "firebase/firestore"
 
-// Convert flat snapshot items into a BudgetTreeNode tree
-function buildTree(items: SharedBudgetSnapshot["items"]): BudgetTreeNode[] {
-  const fakeTimestamp = { toMillis: () => 0, toDate: () => new Date(0), seconds: 0, nanoseconds: 0 } as unknown as Timestamp
+const FAKE_TIMESTAMP = { toMillis: () => 0, toDate: () => new Date(0), seconds: 0, nanoseconds: 0 } as unknown as Timestamp
 
-  const map = new Map<string, BudgetTreeNode>()
-  for (const item of items) {
-    const budgetItem: BudgetItem = {
-      id: item.id,
-      name: item.name,
-      budgetAmount: item.budgetAmount,
-      spentAmount: item.spentAmount,
-      parentId: item.parentId,
-      status: item.status,
-      itemCurrency: item.itemCurrency,
-      vendorName: item.vendorName,
-      notes: null,
-      vendorContact: null,
-      dueDate: null,
-      paidDate: null,
-      currencyRate: null,
-      createdAt: fakeTimestamp,
-      updatedAt: fakeTimestamp,
-    }
-    map.set(item.id, { item: budgetItem, children: [], totalBudget: item.budgetAmount, totalSpent: item.spentAmount, isLeaf: true })
-  }
-
-  const roots: BudgetTreeNode[] = []
-  for (const node of map.values()) {
-    const parent = node.item.parentId ? map.get(node.item.parentId) : null
-    if (parent) parent.children.push(node)
-    else roots.push(node)
-  }
-
-  function computeTotals(node: BudgetTreeNode) {
-    if (node.children.length === 0) { node.isLeaf = true; return }
-    node.isLeaf = false
-    node.children.forEach(computeTotals)
-    node.totalBudget = node.children.reduce((s, c) => s + c.totalBudget, 0)
-    node.totalSpent = node.children.reduce((s, c) => s + c.totalSpent, 0)
-  }
-  roots.forEach(computeTotals)
-  return roots
+function toTreeNode(items: SharedBudgetSnapshot["items"], parentId: string | null): BudgetTreeNode[] {
+  return items
+    .filter((item) => item.parentId === parentId)
+    .map((item) => {
+      const children = toTreeNode(items, item.id)
+      const isLeaf = children.length === 0
+      const totalBudget = isLeaf ? item.budgetAmount : children.reduce((s, c) => s + c.totalBudget, 0)
+      const totalSpent = isLeaf ? item.spentAmount : children.reduce((s, c) => s + c.totalSpent, 0)
+      const budgetItem: BudgetItem = {
+        id: item.id,
+        name: item.name,
+        budgetAmount: item.budgetAmount,
+        spentAmount: item.spentAmount,
+        parentId: item.parentId,
+        status: item.status,
+        itemCurrency: item.itemCurrency,
+        vendorName: item.vendorName,
+        notes: null,
+        vendorContact: null,
+        dueDate: null,
+        paidDate: null,
+        currencyRate: null,
+        createdAt: FAKE_TIMESTAMP,
+        updatedAt: FAKE_TIMESTAMP,
+      }
+      return { item: budgetItem, children, totalBudget, totalSpent, isLeaf }
+    })
 }
 
 function computeOverviewTotals(tree: BudgetTreeNode[]) {
@@ -123,7 +110,7 @@ export default function SharedBudgetPage() {
     )
   }
 
-  const tree = buildTree(snapshot.items)
+  const tree = toTreeNode(snapshot.items, null)
   const { grandBudget, grandSpent, finalizedBudget, draftBudget } = computeOverviewTotals(tree)
   const progress = grandBudget > 0 ? (grandSpent / grandBudget) * 100 : 0
 
