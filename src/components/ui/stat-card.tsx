@@ -36,12 +36,12 @@ export function StatCard({ label, value, icon, className, variant = "default", i
         </div>
         {icon && (
           <div className={cn(
-            "shrink-0 rounded-xl p-2.5",
+            "shrink-0 rounded-lg p-2",
             iconBg ?? "bg-muted",
           )}>
             <Icon
               name={icon}
-              size="lg"
+              size="md"
               className={cn(
                 variant === "danger" ? "text-destructive" : iconClassName ?? "text-muted-foreground",
               )}

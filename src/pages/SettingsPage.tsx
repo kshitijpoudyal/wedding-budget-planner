@@ -217,22 +217,6 @@ export default function SettingsPage() {
         </Button>
       </section>
 
-      {/* Appearance */}
-      <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
-        <h3 className="text-base font-extrabold tracking-tight">Appearance</h3>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Dark Mode</p>
-            <p className="text-xs text-muted-foreground">
-              {theme === "dark" ? "Velvet aesthetic enabled" : "Paper aesthetic enabled"}
-            </p>
-          </div>
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="lg" />
-          </Button>
-        </div>
-      </section>
-
       {/* Share Budget */}
       <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
         <h3 className="text-base font-extrabold tracking-tight">Share Budget</h3>
@@ -294,6 +278,22 @@ export default function SettingsPage() {
         {shareError && (
           <p className="text-[11px] text-destructive">{shareError}</p>
         )}
+      </section>
+
+      {/* Appearance */}
+      <section className="rounded-2xl bg-card glass-card p-5 md:p-6 space-y-5">
+        <h3 className="text-base font-extrabold tracking-tight">Appearance</h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Dark Mode</p>
+            <p className="text-xs text-muted-foreground">
+              {theme === "dark" ? "Velvet aesthetic enabled" : "Paper aesthetic enabled"}
+            </p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size="lg" />
+          </Button>
+        </div>
       </section>
 
       {/* Account */}

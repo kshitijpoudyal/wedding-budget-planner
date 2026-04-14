@@ -30,7 +30,7 @@ export function BudgetFinancialOverview({
       <div className={readOnly ? "grid grid-cols-2 gap-3" : "grid grid-cols-2 md:grid-cols-4 gap-3"}>
         {!readOnly && (
           <StatCard
-            label="Total Estimate"
+            label="Total"
             value={formatCurrency(totalBudget, currency, rate)}
             icon="payments"
             iconClassName="text-primary"
@@ -38,7 +38,7 @@ export function BudgetFinancialOverview({
           />
         )}
         <StatCard
-          label="Finalized"
+          label="Finalized Total"
           value={formatCurrency(finalizedBudget, currency, rate)}
           icon="check_circle"
           iconClassName="text-emerald-600 dark:text-emerald-400"
