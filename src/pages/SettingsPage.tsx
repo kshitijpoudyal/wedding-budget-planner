@@ -42,6 +42,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
   const [sharingEnabled, setSharingEnabled] = useState(false)
   const [shareLoading, setShareLoading] = useState(false)
+  const [shareError, setShareError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -53,7 +54,8 @@ export default function SettingsPage() {
     }
   }, [settings])
 
-  const shareUrl = `${window.location.origin}/shared/${userId}`
+  const appOrigin = import.meta.env.VITE_APP_URL ?? window.location.origin
+  const shareUrl = `${appOrigin}/shared/${userId}`
 
   const buildSnapshot = () => ({
     userId,
@@ -73,10 +75,14 @@ export default function SettingsPage() {
 
   const handleEnableSharing = async () => {
     setShareLoading(true)
+    setShareError(null)
     try {
       await publishSharedBudget(userId, buildSnapshot())
       await updateSettings.mutateAsync({ sharingEnabled: true })
       setSharingEnabled(true)
+    } catch (e) {
+      console.error("Failed to enable sharing:", e)
+      setShareError("Failed to enable sharing. Check console for details.")
     } finally {
       setShareLoading(false)
     }
@@ -84,10 +90,14 @@ export default function SettingsPage() {
 
   const handleDisableSharing = async () => {
     setShareLoading(true)
+    setShareError(null)
     try {
       await deleteSharedBudget(userId)
       await updateSettings.mutateAsync({ sharingEnabled: false })
       setSharingEnabled(false)
+    } catch (e) {
+      console.error("Failed to disable sharing:", e)
+      setShareError("Failed to disable sharing. Check console for details.")
     } finally {
       setShareLoading(false)
     }
@@ -305,6 +315,9 @@ export default function SettingsPage() {
           <p className="text-[11px] text-muted-foreground break-all">{shareUrl}</p>
         </div>
 
+        {shareError && (
+          <p className="text-[11px] text-destructive">{shareError}</p>
+        )}
         <p className="text-[11px] text-muted-foreground">
           {sharingEnabled
             ? "Updates automatically whenever you make changes to the budget."
