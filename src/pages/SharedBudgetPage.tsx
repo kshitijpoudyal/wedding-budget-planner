@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { useOptionalUserId } from "@/contexts/AuthContext"
 import { Icon } from "@/components/ui/icon"
 import { BudgetFinancialOverview } from "@/components/budget/BudgetFinancialOverview"
 import { BudgetCategoryList } from "@/components/budget/BudgetCategoryList"
@@ -56,6 +57,7 @@ const NOOP = () => {}
 export default function SharedBudgetPage() {
   const { token } = useParams<{ token: string }>()
   const queryClient = useQueryClient()
+  const visitorUserId = useOptionalUserId()
   const [items, setItems] = useState<BudgetItem[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -78,12 +80,15 @@ export default function SharedBudgetPage() {
           updatedAt: d.data().updatedAt ?? FAKE_TS,
         } as BudgetItem))
 
-        // Fetch settings and seed into query cache for child components
+        // Fetch settings and seed into query cache for child components.
+        // Seed both null (unauthenticated visitors) and the visitor's own userId
+        // (authenticated visitors) so useSettings() always picks up the owner's currency.
         const settingsSnap = await getDoc(doc(db, "users", token!, "settings", "global"))
         const settings: Settings = settingsSnap.exists()
           ? (settingsSnap.data() as Settings)
           : { currency: "USD", exchangeRate: 147.5, lockRate: false, sharingEnabled: false }
         queryClient.setQueryData(["settings", null], settings)
+        if (visitorUserId) queryClient.setQueryData(["settings", visitorUserId], settings)
 
         setItems(budgetItems)
       } catch (e) {
@@ -95,7 +100,7 @@ export default function SharedBudgetPage() {
     }
 
     load()
-  }, [token, queryClient])
+  }, [token, queryClient, visitorUserId])
 
   if (loading) {
     return (

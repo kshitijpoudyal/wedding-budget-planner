@@ -1,6 +1,5 @@
 import { SectionHeading } from "@/components/ui/section-heading"
 import { StatCard } from "@/components/ui/stat-card"
-import { ProgressBar } from "@/components/ui/progress-bar"
 import { formatCurrency } from "@/lib/currency"
 import { useSettings } from "@/hooks/useSettings"
 
@@ -62,13 +61,6 @@ export function BudgetFinancialOverview({
           iconClassName="text-tertiary"
           iconBg={progress > 100 ? "bg-destructive/10" : "bg-tertiary/10"}
         />
-      </div>
-      <div className="rounded-2xl bg-card glass-card p-5">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-foreground">Overall Progress</p>
-          <p className="text-sm font-bold tabular-nums text-muted-foreground">{Math.round(progress)}%</p>
-        </div>
-        <ProgressBar value={totalSpent} max={totalBudget} showLabel />
       </div>
     </section>
   )

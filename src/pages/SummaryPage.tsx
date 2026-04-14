@@ -3,7 +3,6 @@ import { SectionHeading } from "@/components/ui/section-heading"
 import { StatCard } from "@/components/ui/stat-card"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { QuoteBlock } from "@/components/ui/quote-block"
-import { CategoryBreakdown } from "@/components/summary/CategoryBreakdown"
 import { useBudgetTree } from "@/hooks/useBudgetTree"
 import { useSettings } from "@/hooks/useSettings"
 import { formatCurrency } from "@/lib/currency"
@@ -32,15 +31,6 @@ export default function SummaryPage() {
   const { data: settings } = useSettings()
   const currency = settings?.currency ?? "USD"
   const rate = settings?.exchangeRate ?? 1
-
-  // Status grouping
-  const statusCounts = tree.reduce(
-    (acc, node) => {
-      acc[node.item.status] = (acc[node.item.status] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
 
   if (isLoading) {
     return (
@@ -100,44 +90,6 @@ export default function SummaryPage() {
         </div>
         <ProgressBar value={grandTotalSpent} max={finalizedBudget} />
       </div>
-
-      {/* Category breakdown */}
-      {tree.length > 0 && (
-        <section className="space-y-4">
-          <SectionHeading title="By Category" subtitle="Budget vs. spent per category" />
-          <CategoryBreakdown tree={tree} currency={currency} exchangeRate={rate} />
-        </section>
-      )}
-
-      {/* Status summary */}
-      {tree.length > 0 && (
-        <section className="space-y-4">
-          <SectionHeading title="By Status" />
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard
-              label="Draft"
-              value={String(statusCounts.draft || 0)}
-              icon="edit_note"
-              iconClassName="text-muted-foreground"
-              iconBg="bg-muted"
-            />
-            <StatCard
-              label="Finalized"
-              value={String(statusCounts.finalized || 0)}
-              icon="check_circle"
-              iconClassName="text-primary"
-              iconBg="bg-primary/10"
-            />
-            <StatCard
-              label="Complete"
-              value={String(statusCounts.complete || 0)}
-              icon="task_alt"
-              iconClassName="text-emerald-600 dark:text-emerald-400"
-              iconBg="bg-emerald-500/10"
-            />
-          </div>
-        </section>
-      )}
 
       {tree.length === 0 && (
         <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
