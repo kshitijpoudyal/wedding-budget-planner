@@ -6,13 +6,6 @@ import { useOptionalUserId } from "@/contexts/AuthContext"
 import { getSettings } from "@/services/settings"
 import type { Settings } from "@/types"
 
-const FALLBACK_SETTINGS: Settings = {
-  currency: "USD",
-  exchangeRate: 147.5,
-  lockRate: false,
-  sharingEnabled: false,
-}
-
 export function useSettings() {
   const queryClient = useQueryClient()
   const userId = useOptionalUserId()
@@ -37,6 +30,7 @@ export function useSettings() {
 
   return useQuery({
     queryKey,
-    queryFn: () => userId ? getSettings(userId) : Promise.resolve(FALLBACK_SETTINGS),
+    queryFn: () => getSettings(userId!),
+    enabled: !!userId,
   })
 }
