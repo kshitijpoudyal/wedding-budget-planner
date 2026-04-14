@@ -1,57 +1,68 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { Icon } from "@/components/ui/icon"
 import { StatCard } from "@/components/ui/stat-card"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { SectionHeading } from "@/components/ui/section-heading"
+import { BudgetToolbar } from "@/components/budget/BudgetToolbar"
 import { getSharedBudget } from "@/services/sharing"
 import { formatCurrency } from "@/lib/currency"
 import { getCategoryColor } from "@/lib/categoryColors"
 import { cn } from "@/lib/utils"
-import type { SharedBudgetSnapshot } from "@/types"
+import type { SharedBudgetSnapshot, SearchFilter } from "@/types"
 
-type SnapshotItem = SharedBudgetSnapshot["items"][number]
-
-type TreeNode = SnapshotItem & { children: TreeNode[] }
+type SnapItem = SharedBudgetSnapshot["items"][number]
+type TreeNode = SnapItem & { children: TreeNode[]; totalBudget: number; totalSpent: number }
 
 function buildTree(items: SharedBudgetSnapshot["items"]): TreeNode[] {
   const map = new Map<string, TreeNode>()
-  for (const item of items) map.set(item.id, { ...item, children: [] })
+  for (const item of items) {
+    map.set(item.id, { ...item, children: [], totalBudget: item.budgetAmount, totalSpent: item.spentAmount })
+  }
   const roots: TreeNode[] = []
   for (const node of map.values()) {
     const parent = node.parentId ? map.get(node.parentId) : null
     if (parent) parent.children.push(node)
     else roots.push(node)
   }
+  // Compute totals bottom-up
+  function computeTotals(node: TreeNode) {
+    if (node.children.length === 0) return
+    node.children.forEach(computeTotals)
+    node.totalBudget = node.children.reduce((s, c) => s + c.totalBudget, 0)
+    node.totalSpent = node.children.reduce((s, c) => s + c.totalSpent, 0)
+  }
+  roots.forEach(computeTotals)
   return roots
 }
 
-function sumTree(node: TreeNode): { budget: number; spent: number } {
-  if (node.children.length === 0) return { budget: node.budgetAmount, spent: node.spentAmount }
-  return node.children.reduce(
-    (acc, child) => {
-      const { budget, spent } = sumTree(child)
-      return { budget: acc.budget + budget, spent: acc.spent + spent }
-    },
-    { budget: 0, spent: 0 },
-  )
+function sortTree(nodes: TreeNode[], sort: string): TreeNode[] {
+  const items = [...nodes]
+  if (sort.startsWith("budget")) return items.sort((a, b) => sort.endsWith("asc") ? a.totalBudget - b.totalBudget : b.totalBudget - a.totalBudget)
+  if (sort.startsWith("alpha")) return items.sort((a, b) => sort.endsWith("asc") ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
+  return items
 }
 
-// ── Read-only sub-item card ───────────────────────────────────────────────────
-function ReadOnlySubItem({
-  node,
-  depth,
-  currency,
-  rate,
-}: {
-  node: TreeNode
-  depth: number
-  currency: "USD" | "NPR"
-  rate: number
-}) {
+function filterTree(nodes: TreeNode[], query: string, filterBy: SearchFilter): TreeNode[] {
+  if (!query.trim()) return nodes
+  const q = query.toLowerCase()
+  function matches(node: TreeNode): boolean {
+    if (filterBy === "vendor") return node.vendorName?.toLowerCase().includes(q) ?? false
+    if (filterBy === "name") return node.name.toLowerCase().includes(q)
+    return node.name.toLowerCase().includes(q) || (node.vendorName?.toLowerCase().includes(q) ?? false)
+  }
+  function filterNode(node: TreeNode): TreeNode | null {
+    const filteredChildren = node.children.map(filterNode).filter((c): c is TreeNode => c !== null)
+    if (matches(node) || filteredChildren.length > 0) return { ...node, children: filteredChildren }
+    return null
+  }
+  return nodes.map(filterNode).filter((n): n is TreeNode => n !== null)
+}
+
+// ── Read-only sub-item (matches BudgetSubItemCard visually) ──────────────────
+function ReadOnlySubItem({ node, depth, currency, rate }: { node: TreeNode; depth: number; currency: "USD" | "NPR"; rate: number }) {
   const hasChildren = node.children.length > 0
-  const { budget, spent } = sumTree(node)
   const effectiveCurrency = !hasChildren && node.itemCurrency ? node.itemCurrency : currency
   const effectiveRate = effectiveCurrency === "NPR" ? rate : 1
 
@@ -62,9 +73,9 @@ function ReadOnlySubItem({
           <div className="min-w-0 flex-1">
             <p className="font-medium text-sm truncate">{node.name}</p>
             <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
-              {formatCurrency(spent, effectiveCurrency, effectiveRate)}
+              {formatCurrency(node.totalSpent, effectiveCurrency, effectiveRate)}
               {" / "}
-              {formatCurrency(budget, effectiveCurrency, effectiveRate)}
+              {formatCurrency(node.totalBudget, effectiveCurrency, effectiveRate)}
             </p>
           </div>
         </div>
@@ -77,7 +88,7 @@ function ReadOnlySubItem({
             </span>
           )}
         </div>
-        <ProgressBar value={spent} max={budget} className="mt-2" />
+        <ProgressBar value={node.totalSpent} max={node.totalBudget} className="mt-2" />
       </div>
       {hasChildren && (
         <div className="mt-2 space-y-2">
@@ -90,23 +101,17 @@ function ReadOnlySubItem({
   )
 }
 
-// ── Read-only category card ───────────────────────────────────────────────────
-function ReadOnlyCategoryCard({
-  node,
-  currency,
-  rate,
-}: {
-  node: TreeNode
-  currency: "USD" | "NPR"
-  rate: number
-}) {
+// ── Read-only category card (matches BudgetCategoryCard visually) ────────────
+function ReadOnlyCategoryCard({ node, sort, currency, rate }: { node: TreeNode; sort: string; currency: "USD" | "NPR"; rate: number }) {
   const [expanded, setExpanded] = useState(false)
-  const { budget, spent } = sumTree(node)
   const hasChildren = node.children.length > 0
   const color = getCategoryColor(node.name)
+  const effectiveCurrency = hasChildren ? currency : (node.itemCurrency ?? currency)
+  const effectiveRate = effectiveCurrency === "NPR" ? rate : 1
+  const sortedChildren = useMemo(() => sortTree(node.children, sort), [node.children, sort])
 
   return (
-    <div className={cn("rounded-2xl overflow-hidden shadow-sm glass-card bg-card border-l-4", color.border)}>
+    <div className="rounded-2xl overflow-hidden transition-all duration-200 shadow-sm glass-card bg-card">
       <button type="button" className="w-full text-left p-5 md:p-6" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
@@ -116,22 +121,27 @@ function ReadOnlyCategoryCard({
               <StatusBadge status={node.status} />
             </div>
             <div className="flex gap-4 mt-1.5 text-sm text-muted-foreground tabular-nums">
-              <span>Budget: {formatCurrency(budget, currency, currency === "NPR" ? rate : 1)}</span>
-              <span>Spent: {formatCurrency(spent, currency, currency === "NPR" ? rate : 1)}</span>
+              <span>Budget: {formatCurrency(node.totalBudget, effectiveCurrency, effectiveRate)}</span>
+              <span>Spent: {formatCurrency(node.totalSpent, effectiveCurrency, effectiveRate)}</span>
             </div>
           </div>
-          {hasChildren && (
-            <Icon name={expanded ? "expand_less" : "expand_more"} size="lg" className="text-muted-foreground shrink-0" />
-          )}
+          <div className="flex items-center gap-1 shrink-0">
+            <Icon name={expanded ? "expand_less" : "expand_more"} size="lg" className="text-muted-foreground" />
+          </div>
         </div>
-        <ProgressBar value={spent} max={budget} className="mt-3" />
+        <ProgressBar value={node.totalSpent} max={node.totalBudget} className="mt-3" />
       </button>
 
       {expanded && hasChildren && (
         <div className="px-5 pb-5 md:px-6 md:pb-6 space-y-2">
-          {node.children.map((child) => (
+          {sortedChildren.map((child) => (
             <ReadOnlySubItem key={child.id} node={child} depth={1} currency={currency} rate={rate} />
           ))}
+        </div>
+      )}
+      {expanded && !hasChildren && (
+        <div className="px-5 pb-5 md:px-6 md:pb-6">
+          <p className="text-sm text-muted-foreground italic text-center py-4">No sub-items.</p>
         </div>
       )}
     </div>
@@ -144,6 +154,11 @@ export default function SharedBudgetPage() {
   const [snapshot, setSnapshot] = useState<SharedBudgetSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+
+  // Toolbar state
+  const [sort, setSort] = useState("budget-desc")
+  const [search, setSearch] = useState("")
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>("all")
 
   useEffect(() => {
     if (!token) { setNotFound(true); setLoading(false); return }
@@ -171,22 +186,29 @@ export default function SharedBudgetPage() {
     )
   }
 
-  const { currency, exchangeRate } = snapshot.settings
-  const rate = exchangeRate
+  const { currency, exchangeRate: rate } = snapshot.settings
   const tree = buildTree(snapshot.items)
 
+  // Financial totals
   let grandBudget = 0, grandSpent = 0, finalizedBudget = 0, draftBudget = 0
-  for (const node of tree) {
-    const { budget, spent } = sumTree(node)
-    grandBudget += budget
-    grandSpent += spent
-    if (node.status === "finalized" || node.status === "complete") finalizedBudget += budget
-    if (node.status === "draft") draftBudget += budget
+  function sumLeaves(nodes: TreeNode[]) {
+    for (const n of nodes) {
+      if (n.children.length === 0) {
+        grandBudget += n.budgetAmount
+        grandSpent += n.spentAmount
+        if (n.status === "finalized") finalizedBudget += n.budgetAmount
+        else if (n.status === "draft") draftBudget += n.budgetAmount
+      } else {
+        sumLeaves(n.children)
+      }
+    }
   }
-
+  sumLeaves(tree)
   const progress = grandBudget > 0 ? (grandSpent / grandBudget) * 100 : 0
-  const remaining = grandBudget - grandSpent
   const fmt = (n: number) => formatCurrency(n, currency, currency === "NPR" ? rate : 1)
+
+  const filteredTree = filterTree(tree, search, searchFilter)
+  const sortedTree = sortTree(filteredTree, sort)
 
   return (
     <div className="min-h-screen bg-background">
@@ -209,8 +231,8 @@ export default function SharedBudgetPage() {
         </div>
       </div>
 
-      <div className="p-5 md:p-8 space-y-10 max-w-4xl mx-auto">
-        {/* Financial Overview */}
+      <div className="p-4 md:p-6 space-y-8 max-w-4xl mx-auto">
+        {/* Financial Overview — matches BudgetFinancialOverview */}
         <section className="space-y-5">
           <SectionHeading title="Financial Overview" subtitle="The Wedding Budget" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -221,27 +243,53 @@ export default function SharedBudgetPage() {
           </div>
           <div className="rounded-2xl bg-card glass-card p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold">Overall Progress</p>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground tabular-nums">
-                <span>Remaining: <span className={cn("font-bold", remaining < 0 && "text-destructive")}>{fmt(remaining)}</span></span>
-                <span className="font-bold">{Math.round(progress)}%</span>
-              </div>
+              <p className="text-sm font-semibold text-foreground">Overall Progress</p>
+              <p className="text-sm font-bold tabular-nums text-muted-foreground">{Math.round(progress)}%</p>
             </div>
             <ProgressBar value={grandSpent} max={grandBudget} showLabel />
           </div>
         </section>
 
-        {/* Budget Categories */}
-        {tree.length > 0 && (
-          <section className="space-y-4">
-            <SectionHeading title="Budget Categories" subtitle="Tap a category to expand" />
-            <div className="space-y-3">
-              {tree.map((node) => (
-                <ReadOnlyCategoryCard key={node.id} node={node} currency={currency} rate={rate} />
+        {/* Budget list — matches BudgetCategoryList */}
+        <section className="space-y-4">
+          <SectionHeading title="The Curation" subtitle="Financial narratives for your celebration" />
+
+          <BudgetToolbar
+            search={search}
+            onSearchChange={setSearch}
+            searchFilter={searchFilter}
+            onSearchFilterChange={setSearchFilter}
+            sortValue={sort}
+            onSortChange={setSort}
+            selectionMode={false}
+            onSelectionModeChange={() => {}}
+            selectedCount={0}
+            totalCount={tree.length}
+            onSelectAll={() => {}}
+            onClearSelection={() => {}}
+            onAdd={() => {}}
+            hasItems={tree.length > 0}
+            readOnly
+            className="sticky top-4 md:top-6 z-20"
+          />
+
+          {sortedTree.length === 0 && tree.length === 0 ? (
+            <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
+              <p className="text-lg text-muted-foreground italic">No budget items shared yet.</p>
+            </div>
+          ) : sortedTree.length === 0 ? (
+            <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
+              <Icon name="search_off" size="lg" className="text-muted-foreground mx-auto mb-2" />
+              <p className="text-lg text-muted-foreground italic">No items match your filters</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {sortedTree.map((node) => (
+                <ReadOnlyCategoryCard key={node.id} node={node} sort={sort} currency={currency} rate={rate} />
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         <p className="text-center text-xs text-muted-foreground pb-4">
           Last updated: {new Date(snapshot.updatedAt).toLocaleString()}

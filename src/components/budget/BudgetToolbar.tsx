@@ -28,6 +28,7 @@ type BudgetToolbarProps = {
   // State
   hasItems: boolean
   className?: string
+  readOnly?: boolean
 }
 
 const FILTER_OPTIONS: { value: SearchFilter; label: string; icon: string }[] = [
@@ -58,6 +59,7 @@ export function BudgetToolbar({
   onAdd,
   hasItems,
   className,
+  readOnly = false,
 }: BudgetToolbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -192,7 +194,7 @@ export function BudgetToolbar({
         </div>
 
         {/* Selection toggle */}
-        {hasItems && (
+        {!readOnly && hasItems && (
           <Button
             variant={selectionMode ? "secondary" : "ghost"}
             size="icon"
@@ -211,9 +213,11 @@ export function BudgetToolbar({
         )}
 
         {/* Add button */}
-        <Button onClick={onAdd} size="icon" title="Add item">
-          <Icon name="add" size="md" />
-        </Button>
+        {!readOnly && (
+          <Button onClick={onAdd} size="icon" title="Add item">
+            <Icon name="add" size="md" />
+          </Button>
+        )}
       </div>
 
       {/* Selection row */}
