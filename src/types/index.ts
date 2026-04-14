@@ -47,9 +47,15 @@ export type PaymentInput = Omit<Payment, "id" | "createdAt">
 export type SearchFilter = "all" | "name" | "vendor" | "notes"
 
 // Serialized snapshot stored in publicBudgets/{userId} for read-only family sharing
+// createdAt/updatedAt are optional because old Firestore documents may not have them
+export type SnapshotItem = Omit<BudgetItem, "createdAt" | "updatedAt"> & {
+  createdAt?: BudgetItem["createdAt"]
+  updatedAt?: BudgetItem["updatedAt"]
+}
+
 export type SharedBudgetSnapshot = {
   userId: string
-  items: BudgetItem[]
+  items: SnapshotItem[]
   settings: { currency: "USD" | "NPR"; exchangeRate: number }
   updatedAt: string // ISO string
 }

@@ -6,11 +6,18 @@ import { BudgetFinancialOverview } from "@/components/budget/BudgetFinancialOver
 import { BudgetCategoryList } from "@/components/budget/BudgetCategoryList"
 import { QuoteBlock } from "@/components/ui/quote-block"
 import { getSharedBudget } from "@/services/sharing"
-import type { BudgetItem, Settings, SharedBudgetSnapshot } from "@/types"
+import type { BudgetItem, Settings, SharedBudgetSnapshot, SnapshotItem } from "@/types"
 import type { BudgetTreeNode } from "@/hooks/useBudgetTree"
+import type { Timestamp } from "firebase/firestore"
+
+const FAKE_TS = { toMillis: () => 0, toDate: () => new Date(0), seconds: 0, nanoseconds: 0 } as unknown as Timestamp
+
+function toItem(s: SnapshotItem): BudgetItem {
+  return { ...s, createdAt: s.createdAt ?? FAKE_TS, updatedAt: s.updatedAt ?? FAKE_TS }
+}
 
 // Exact same logic as useBudgetTree.ts
-function buildTree(items: BudgetItem[], parentId: string | null): BudgetTreeNode[] {
+function buildTree(items: SnapshotItem[], parentId: string | null): BudgetTreeNode[] {
   return items
     .filter((item) => item.parentId === parentId)
     .map((item) => {
@@ -22,7 +29,7 @@ function buildTree(items: BudgetItem[], parentId: string | null): BudgetTreeNode
       const totalSpent = isLeaf
         ? item.spentAmount
         : children.reduce((sum, child) => sum + child.totalSpent, 0)
-      return { item, children, totalBudget, totalSpent, isLeaf }
+      return { item: toItem(item), children, totalBudget, totalSpent, isLeaf }
     })
 }
 

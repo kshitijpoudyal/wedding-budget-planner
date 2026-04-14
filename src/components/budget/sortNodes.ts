@@ -11,9 +11,9 @@ export function sortNodes(nodes: BudgetTreeNode[], sort: string): BudgetTreeNode
     case "alpha-desc":
       return items.sort((a, b) => b.item.name.localeCompare(a.item.name))
     case "date-desc":
-      return items.sort((a, b) => b.item.updatedAt.toMillis() - a.item.updatedAt.toMillis())
+      return items.sort((a, b) => (b.item.updatedAt?.toMillis() ?? 0) - (a.item.updatedAt?.toMillis() ?? 0))
     case "date-asc":
-      return items.sort((a, b) => a.item.updatedAt.toMillis() - b.item.updatedAt.toMillis())
+      return items.sort((a, b) => (a.item.updatedAt?.toMillis() ?? 0) - (b.item.updatedAt?.toMillis() ?? 0))
     case "budget-desc":
       return items.sort((a, b) => b.totalBudget - a.totalBudget)
     case "budget-asc":

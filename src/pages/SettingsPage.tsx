@@ -73,8 +73,8 @@ export default function SettingsPage() {
       dueDate: item.dueDate ?? null,
       paidDate: item.paidDate ?? null,
       currencyRate: item.currencyRate ?? null,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
+      ...(item.createdAt ? { createdAt: item.createdAt } : {}),
+      ...(item.updatedAt ? { updatedAt: item.updatedAt } : {}),
     })),
     settings: { currency: settings!.currency, exchangeRate: settings!.exchangeRate },
     updatedAt: new Date().toISOString(),
@@ -288,25 +288,26 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {/* Always-visible link row */}
-        <div className="rounded-xl bg-muted/50 px-3 py-3 space-y-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <Icon name="link" size="sm" className={sharingEnabled ? "text-primary shrink-0" : "text-muted-foreground shrink-0"} />
-              <p className="text-xs font-medium text-foreground">Share link</p>
+        {sharingEnabled && (
+          <div className="rounded-xl bg-muted/50 px-3 py-3 space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Icon name="link" size="sm" className="text-primary shrink-0" />
+                <p className="text-xs font-medium text-foreground">Share link</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                title="Copy link"
+              >
+                <Icon name={copied ? "check" : "content_copy"} size="sm" />
+                {copied ? "Copied!" : "Copy"}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              title="Copy link"
-            >
-              <Icon name={copied ? "check" : "content_copy"} size="sm" />
-              {copied ? "Copied!" : "Copy"}
-            </button>
+            <p className="text-[11px] text-muted-foreground break-all">{shareUrl}</p>
           </div>
-          <p className="text-[11px] text-muted-foreground break-all">{shareUrl}</p>
-        </div>
+        )}
 
         {shareError && (
           <p className="text-[11px] text-destructive">{shareError}</p>
