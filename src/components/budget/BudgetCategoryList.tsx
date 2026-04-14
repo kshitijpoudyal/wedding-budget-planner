@@ -22,6 +22,7 @@ type BudgetCategoryListProps = {
   bulkUpdateLoading?: boolean
   onStatusChange?: (id: string, newStatus: BudgetItem["status"]) => void
   onInlineUpdate?: (id: string, field: "budgetAmount" | "spentAmount", displayValue: number) => void
+  readOnly?: boolean
 }
 
 // Helper to collect all item IDs from tree nodes recursively
@@ -89,6 +90,7 @@ export function BudgetCategoryList({
   bulkUpdateLoading,
   onStatusChange,
   onInlineUpdate,
+  readOnly = false,
 }: BudgetCategoryListProps) {
   const [sort, setSort] = useState("budget-desc")
   const [search, setSearch] = useState("")
@@ -149,6 +151,7 @@ export function BudgetCategoryList({
         onClearSelection={clearSelection}
         onAdd={onAddRoot}
         hasItems={tree.length > 0}
+        readOnly={readOnly}
         className="sticky top-4 md:top-6 z-20"
       />
 
@@ -157,10 +160,12 @@ export function BudgetCategoryList({
           <p className="text-lg text-muted-foreground italic">
             Your celebration awaits its first chapter.
           </p>
-          <Button onClick={onAddRoot} className="mt-4">
-            <Icon name="add" size="md" />
-            <span className="ml-1">Add First Category</span>
-          </Button>
+          {!readOnly && (
+            <Button onClick={onAddRoot} className="mt-4">
+              <Icon name="add" size="md" />
+              <span className="ml-1">Add First Category</span>
+            </Button>
+          )}
         </div>
       ) : sortedTree.length === 0 ? (
         <div className="rounded-xl bg-surface-container-low glass-surface p-8 md:p-12 text-center">
@@ -192,17 +197,20 @@ export function BudgetCategoryList({
               onToggleSelection={toggleSelection}
               onStatusChange={onStatusChange}
               onInlineUpdate={onInlineUpdate}
+              readOnly={readOnly}
             />
           ))}
         </div>
       )}
 
-      <BulkActionBar
-        selectedCount={selectedIds.size}
-        onStatusChange={handleBulkStatusChange}
-        onClearSelection={clearSelection}
-        loading={bulkUpdateLoading}
-      />
+      {!readOnly && (
+        <BulkActionBar
+          selectedCount={selectedIds.size}
+          onStatusChange={handleBulkStatusChange}
+          onClearSelection={clearSelection}
+          loading={bulkUpdateLoading}
+        />
+      )}
     </section>
   )
 }

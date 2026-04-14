@@ -10,6 +10,7 @@ type BudgetFinancialOverviewProps = {
   finalizedBudget: number
   draftBudget: number
   progress: number
+  readOnly?: boolean
 }
 
 export function BudgetFinancialOverview({
@@ -18,6 +19,7 @@ export function BudgetFinancialOverview({
   finalizedBudget,
   draftBudget,
   progress,
+  readOnly = false,
 }: BudgetFinancialOverviewProps) {
   const { data: settings } = useSettings()
   const currency = settings?.currency ?? "USD"
@@ -26,14 +28,16 @@ export function BudgetFinancialOverview({
   return (
     <section className="space-y-5">
       <SectionHeading title="Financial Overview" subtitle="The Wedding Budget" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard
-          label="Total Estimate"
-          value={formatCurrency(totalBudget, currency, rate)}
-          icon="payments"
-          iconClassName="text-primary"
-          iconBg="bg-primary/10"
-        />
+      <div className={readOnly ? "grid grid-cols-2 gap-3" : "grid grid-cols-2 md:grid-cols-4 gap-3"}>
+        {!readOnly && (
+          <StatCard
+            label="Total Estimate"
+            value={formatCurrency(totalBudget, currency, rate)}
+            icon="payments"
+            iconClassName="text-primary"
+            iconBg="bg-primary/10"
+          />
+        )}
         <StatCard
           label="Finalized"
           value={formatCurrency(finalizedBudget, currency, rate)}
@@ -41,13 +45,15 @@ export function BudgetFinancialOverview({
           iconClassName="text-emerald-600 dark:text-emerald-400"
           iconBg="bg-emerald-500/10"
         />
-        <StatCard
-          label="Draft"
-          value={formatCurrency(draftBudget, currency, rate)}
-          icon="edit_note"
-          iconClassName="text-amber-600 dark:text-amber-400"
-          iconBg="bg-amber-500/10"
-        />
+        {!readOnly && (
+          <StatCard
+            label="Draft"
+            value={formatCurrency(draftBudget, currency, rate)}
+            icon="edit_note"
+            iconClassName="text-amber-600 dark:text-amber-400"
+            iconBg="bg-amber-500/10"
+          />
+        )}
         <StatCard
           label="Spent So Far"
           value={formatCurrency(totalSpent, currency, rate)}

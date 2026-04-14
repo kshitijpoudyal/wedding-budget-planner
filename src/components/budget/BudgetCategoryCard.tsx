@@ -32,6 +32,7 @@ type BudgetCategoryCardProps = {
   onToggleSelection?: (id: string) => void
   onStatusChange?: (id: string, newStatus: BudgetItem["status"]) => void
   onInlineUpdate?: (id: string, field: "budgetAmount" | "spentAmount", displayValue: number) => void
+  readOnly?: boolean
 }
 
 export function BudgetCategoryCard({
@@ -46,6 +47,7 @@ export function BudgetCategoryCard({
   onToggleSelection,
   onStatusChange,
   onInlineUpdate,
+  readOnly = false,
 }: BudgetCategoryCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -194,7 +196,7 @@ export function BudgetCategoryCard({
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {!selectionMode && (
+            {!selectionMode && !readOnly && (
               <div onClick={(e) => e.stopPropagation()}>
                 <CategoryActionMenu
                   onEdit={() => onEdit(node)}
@@ -233,6 +235,7 @@ export function BudgetCategoryCard({
               onToggleSelection={onToggleSelection}
               onStatusChange={onStatusChange}
               onInlineUpdate={onInlineUpdate}
+              readOnly={readOnly}
             />
           ))}
         </div>

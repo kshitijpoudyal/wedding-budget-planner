@@ -39,3 +39,8 @@ export function useUserId(): string {
   if (!user) throw new Error("useUserId called without authenticated user")
   return user.uid
 }
+
+export function useOptionalUserId(): string | null {
+  const { user } = useAuth()
+  return user?.uid ?? null
+}

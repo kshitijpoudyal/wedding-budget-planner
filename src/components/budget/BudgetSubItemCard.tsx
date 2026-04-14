@@ -42,6 +42,7 @@ type BudgetSubItemCardProps = {
   onToggleSelection?: (id: string) => void
   onStatusChange?: (id: string, newStatus: BudgetItem["status"]) => void
   onInlineUpdate?: (id: string, field: "budgetAmount" | "spentAmount", displayValue: number) => void
+  readOnly?: boolean
 }
 
 export function BudgetSubItemCard({
@@ -58,6 +59,7 @@ export function BudgetSubItemCard({
   onToggleSelection,
   onStatusChange,
   onInlineUpdate,
+  readOnly = false,
 }: BudgetSubItemCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [editingField, setEditingField] = useState<"budgetAmount" | "spentAmount" | null>(null)
@@ -176,7 +178,7 @@ export function BudgetSubItemCard({
               )}
             </p>
           </div>
-          {!selectionMode && (
+          {!selectionMode && !readOnly && (
             <CategoryActionMenu
               onEdit={() => onEdit(node)}
               onAddChild={() => onAddChild(item.id)}
@@ -262,6 +264,7 @@ export function BudgetSubItemCard({
               onToggleSelection={onToggleSelection}
               onStatusChange={onStatusChange}
               onInlineUpdate={onInlineUpdate}
+              readOnly={readOnly}
             />
           ))}
         </div>

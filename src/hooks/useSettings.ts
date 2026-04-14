@@ -2,16 +2,24 @@ import { useEffect } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { doc, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { useUserId } from "@/contexts/AuthContext"
+import { useOptionalUserId } from "@/contexts/AuthContext"
 import { getSettings } from "@/services/settings"
 import type { Settings } from "@/types"
 
+const FALLBACK_SETTINGS: Settings = {
+  currency: "USD",
+  exchangeRate: 147.5,
+  lockRate: false,
+  sharingEnabled: false,
+}
+
 export function useSettings() {
   const queryClient = useQueryClient()
-  const userId = useUserId()
+  const userId = useOptionalUserId()
   const queryKey = ["settings", userId]
 
   useEffect(() => {
+    if (!userId) return
     const unsubscribe = onSnapshot(
       doc(db, `users/${userId}/settings/global`),
       (snap) => {
@@ -29,6 +37,6 @@ export function useSettings() {
 
   return useQuery({
     queryKey,
-    queryFn: () => getSettings(userId),
+    queryFn: () => userId ? getSettings(userId) : Promise.resolve(FALLBACK_SETTINGS),
   })
 }
