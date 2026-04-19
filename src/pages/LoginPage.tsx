@@ -80,6 +80,17 @@ export default function LoginPage() {
           </Button>
         </form>
       </div>
+      <p className="mt-6 text-xs text-muted-foreground/60 text-center">
+        Powered by{" "}
+        <a
+          href="https://www.kshitijstudio.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-muted-foreground transition-colors duration-200 underline underline-offset-2"
+        >
+          KshitijStudio
+        </a>
+      </p>
     </div>
   )
 }

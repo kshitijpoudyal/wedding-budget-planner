@@ -23,7 +23,18 @@
       "Bash(find /Users/a266352/Desktop/YalaIt/wedding-budget-planner -maxdepth 1 -name .env* -o -name *.env*)",
       "Bash(grep -r \"export.*auth\\\\|export.*Auth\\\\|export.*user\\\\|export.*User\" /Users/a266352/Desktop/YalaIt/wedding-budget-planner/src --include=*.ts --include=*.tsx)",
       "Bash(npm ls:*)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(find /Users/a266352/kay/wedding-budget-planner -maxdepth 2 -name *.config.js -o -name *.config.ts)",
+      "Bash(ls:*)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i '' 's/spentAmountRate/currencyRate/g' \"/Users/a266352/kay/wedding-budget-planner/$f\")",
+      "Bash(done)",
+      "mcp__ide__getDiagnostics",
+      "Bash(wc:*)"
     ]
   }
 }
